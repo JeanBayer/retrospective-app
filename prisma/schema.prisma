@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,72 +9,90 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid()) @map("user_id")
-  email     String   @unique
-  name      String   // Nuevo campo para el nombre del usuario
-  password  String   @map("hashed_password") // Contraseña del usuario para su cuenta
-  
+  id       String @id @default(uuid()) @map("user_id")
+  email    String @unique
+  name     String
+  password String @map("hashed_password")
+
   sprintWins Int @default(0) @map("sprint_wins")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships       TeamMembership[] // Relación con los equipos a los que pertenece
-  thankYousGiven    ThankYou[] @relation("GivenThankYous")
-  thankYousReceived ThankYou[] @relation("ReceivedThankYous")
+  memberships       TeamMembership[]
+  thankYousGiven    ThankYou[]       @relation("GivenThankYous")
+  thankYousReceived ThankYou[]       @relation("ReceivedThankYous")
 
-  // Los usuarios votan en retrospectivas a través de su pertenencia a un equipo.
-  // La relación 'voters' en Retrospective ahora apunta a 'User'.
-  // SprintWinner es el usuario que gana el sprint, no quien vota.
-  // Retrospective es el contenedor de la votación
-  votedForRetrospectives Retrospective[] @relation("Voters")
-  
-  // Para el ganador del sprint
+  votedForRetrospectives       Retrospective[] @relation("Voters")
   sprintWinnerOfRetrospectives Retrospective[] @relation("SprintWinner")
 
   @@map("users")
 }
 
 model Team {
-  id                      String    @id @default(uuid()) @map("team_id")
-  name                    String    @unique @map("team_name")
-  joinPassword            String    @map("hashed_join_password") // Contraseña para unirse al equipo
-  
-  currentIncidentFreeDays Int       @default(0) @map("current_incident_free_days")
-  longestIncidentFreeDays Int       @default(0) @map("longest_incident_free_days")
-  lastIncidentFreeDuration Int       @default(0) @map("last_incident_free_duration")
-  
-  pageTitle               String    @default("Días sin Incidente en Producción") @map("page_title")
-  incrementButtonLabel    String    @default("Un día más sin incidente") @map("increment_button_label")
-  incidentButtonLabel     String    @default("¡Incidente!") @map("incident_button_label")
+  id           String @id @default(uuid()) @map("team_id")
+  name         String @unique @map("team_name")
+  joinPassword String @map("hashed_join_password")
 
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships             TeamMembership[] // Relación con los miembros del equipo
-  goals                   Goal[]
-  incidentRecords         IncidentRecord[]
-  retrospectives          Retrospective[]
+  memberships    TeamMembership[]
+  retrospectives Retrospective[]
+  counters       Counter[]
 
   @@map("teams")
 }
 
-// Nueva Entidad: TeamMembership
 model TeamMembership {
-  id        String   @id @default(uuid()) @map("membership_id")
-  
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  
-  teamId    String   @map("team_id")
-  team      Team     @relation(fields: [teamId], references: [id])
+  id String @id @default(uuid()) @map("membership_id")
 
-  isAdmin   Boolean  @default(false) @map("is_admin") // Rol específico para esta membresía de equipo
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id])
 
-  joinedAt  DateTime @default(now()) @map("joined_at")
+  teamId String @map("team_id")
+  team   Team   @relation(fields: [teamId], references: [id])
 
-  @@unique([userId, teamId]) // Un usuario solo puede tener una membresía por equipo
+  isAdmin Boolean @default(false) @map("is_admin")
+
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  @@unique([userId, teamId])
   @@map("team_memberships")
+}
+
+model Counter {
+  id     String @id @default(uuid()) @map("counter_id")
+  teamId String @map("team_id")
+  team   Team   @relation(fields: [teamId], references: [id])
+
+  name              String
+  currentCount      Int    @default(0) @map("current_count")
+  longestStreak     Int    @default(0) @map("longest_streak")
+  lastResetDuration Int    @default(0) @map("last_reset_duration")
+
+  pageTitle            String @default("Días sin evento") @map("page_title")
+  incrementButtonLabel String @default("Un día más") @map("increment_button_label")
+  resetButtonLabel     String @default("¡Evento!") @map("reset_button_label")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  resetRecords CounterResetRecord[]
+  goals        Goal[] // Nueva relación: un contador puede tener muchas metas asociadas
+
+  @@map("counters")
+}
+
+model CounterResetRecord {
+  id        String  @id @default(uuid()) @map("record_id")
+  counterId String  @map("counter_id")
+  counter   Counter @relation(fields: [counterId], references: [id])
+
+  countBeforeReset Int      @map("count_before_reset")
+  resetOccurredAt  DateTime @default(now()) @map("reset_occurred_at")
+
+  @@map("counter_reset_records")
 }
 
 model Goal {
@@ -90,60 +102,49 @@ model Goal {
   achieved    Boolean   @default(false)
   achievedAt  DateTime? @map("achieved_at")
 
-  teamId      String    @map("team_id")
-  team        Team      @relation(fields: [teamId], references: [id])
+  counterId String  @map("counter_id") // Clave foránea para el Counter
+  counter   Counter @relation(fields: [counterId], references: [id])
 
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("goals")
 }
 
-model IncidentRecord {
-  id                String   @id @default(uuid()) @map("record_id")
-  daysBeforeIncident Int      @map("days_before_incident")
-  occurredAt        DateTime @default(now()) @map("occurred_at")
-
-  teamId            String   @map("team_id")
-  team              Team     @relation(fields: [teamId], references: [id])
-
-  @@map("incident_records")
-}
-
 model Retrospective {
-  id             String    @id @default(uuid()) @map("retrospective_id")
-  teamId         String    @map("team_id")
-  team           Team      @relation(fields: [teamId], references: [id])
-  
-  retrospectiveNumber Int       @map("retrospective_number")
-  
-  createdAt      DateTime  @default(now()) @map("created_at")
-  
-  voters         User[]    @relation("Voters") // Usuarios que han votado en esta retrospectiva
-  
-  sprintWinnerId String?   @map("sprint_winner_id")
-  sprintWinner   User?     @relation("SprintWinner", fields: [sprintWinnerId], references: [id])
+  id     String @id @default(uuid()) @map("retrospective_id")
+  teamId String @map("team_id")
+  team   Team   @relation(fields: [teamId], references: [id])
 
-  thankYous      ThankYou[]
+  retrospectiveNumber Int @map("retrospective_number")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  voters User[] @relation("Voters")
+
+  sprintWinnerId String? @map("sprint_winner_id")
+  sprintWinner   User?   @relation("SprintWinner", fields: [sprintWinnerId], references: [id])
+
+  thankYous ThankYou[]
 
   @@unique([teamId, retrospectiveNumber])
   @@map("retrospectives")
 }
 
 model ThankYou {
-  id             String   @id @default(uuid()) @map("thank_you_id")
-  message        String   @db.Text
-  
-  giverId        String   @map("giver_id")
-  giver          User     @relation("GivenThankYous", fields: [giverId], references: [id])
-  
-  receiverId     String?  @map("receiver_id")
-  receiver       User?    @relation("ReceivedThankYous", fields: [receiverId], references: [id])
-  
-  retrospectiveId String   @map("retrospective_id")
-  retrospective  Retrospective @relation(fields: [retrospectiveId], references: [id])
+  id      String @id @default(uuid()) @map("thank_you_id")
+  message String @db.Text
 
-  createdAt      DateTime @default(now()) @map("created_at")
+  giverId String @map("giver_id")
+  giver   User   @relation("GivenThankYous", fields: [giverId], references: [id])
+
+  receiverId String? @map("receiver_id")
+  receiver   User?   @relation("ReceivedThankYous", fields: [receiverId], references: [id])
+
+  retrospectiveId String        @map("retrospective_id")
+  retrospective   Retrospective @relation(fields: [retrospectiveId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
 
   @@map("thank_yous")
 }
