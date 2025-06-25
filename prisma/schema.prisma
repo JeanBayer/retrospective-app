@@ -8,11 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum MembershipStatus {
-  ACTIVE
-  ARCHIVED
-}
-
 model User {
   id       String @id @default(uuid()) @map("user_id")
   email    String @unique
@@ -58,9 +53,8 @@ model TeamMembership {
   teamId String @map("team_id")
   team   Team   @relation(fields: [teamId], references: [id])
 
-  isAdmin  Boolean          @default(false) @map("is_admin")
-  status   MembershipStatus @default(ACTIVE)
-  joinedAt DateTime         @default(now()) @map("joined_at")
+  isAdmin  Boolean  @default(false) @map("is_admin")
+  joinedAt DateTime @default(now()) @map("joined_at")
 
   @@unique([userId, teamId])
   @@map("team_memberships")
