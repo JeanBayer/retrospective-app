@@ -36,7 +36,7 @@ model User {
 
 model Team {
   id           String @id @default(uuid()) @map("team_id")
-  name         String @unique @map("team_name")
+  name         String @map("team_name")
   joinPassword String @map("hashed_join_password")
 
   createdAt DateTime @default(now()) @map("created_at")

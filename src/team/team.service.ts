@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { compareSync, hashSync } from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -6,32 +12,41 @@ import { JoinTeamDto } from './dto/join-team.dto';
 
 @Injectable()
 export class TeamService extends PrismaClient implements OnModuleInit {
+  private readonly logger = new Logger(TeamService.name);
   async onModuleInit() {
     await this.$connect();
   }
 
-  async createTeam(createTeamDto: CreateTeamDto) {
+  async createTeam(createTeamDto: CreateTeamDto, userId: string) {
     const { name, joinPassword } = createTeamDto;
-    const team = await this.team.create({
-      data: {
-        name,
-        joinPassword: hashSync(joinPassword, 10),
-        memberships: {
-          create: {
-            userId: '04ecd051-1e64-42cf-8f33-0a0988391824',
-            isAdmin: true,
+
+    try {
+      const team = await this.team.create({
+        data: {
+          name,
+          joinPassword: hashSync(joinPassword, 10),
+          memberships: {
+            create: {
+              userId,
+              isAdmin: true,
+            },
           },
         },
-      },
-      select: {
-        id: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
+        select: {
+          id: true,
+          name: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
 
-    return team;
+      return team;
+    } catch (error: unknown) {
+      this.logger.error('Error creating team', error);
+      throw new InternalServerErrorException(
+        'An error occurred. Please try again later.',
+      );
+    }
   }
 
   async joinTeam(joinTeamDto: JoinTeamDto) {

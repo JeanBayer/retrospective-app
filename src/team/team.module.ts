@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TeamService } from './team.service';
+import { AuthModule } from 'src/auth/auth.module';
 import { TeamController } from './team.controller';
+import { TeamService } from './team.service';
 
 @Module({
   controllers: [TeamController],
   providers: [TeamService],
+  imports: [AuthModule],
 })
 export class TeamModule {}
