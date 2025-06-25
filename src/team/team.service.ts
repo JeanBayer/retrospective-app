@@ -57,7 +57,7 @@ export class TeamService extends PrismaClient implements OnModuleInit {
       teamId,
     );
 
-    if (userAlreadyInTeam)
+    if (userAlreadyInTeam && userAlreadyInTeam.status === 'ACTIVE')
       throw new ConflictException('User is already a member of this team');
 
     try {
@@ -65,6 +65,18 @@ export class TeamService extends PrismaClient implements OnModuleInit {
         teamId,
         joinPassword,
       );
+
+      if (userAlreadyInTeam) {
+        await this.teamMembership.update({
+          where: {
+            id: userAlreadyInTeam.id,
+          },
+          data: {
+            status: 'ACTIVE',
+          },
+        });
+        return team;
+      }
 
       await this.teamMembership.create({
         data: {
