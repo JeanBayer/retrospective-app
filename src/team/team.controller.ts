@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { User } from 'src/auth/decorators/user.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
@@ -33,5 +33,10 @@ export class TeamController {
     validateOrThrow(joinTeamDto);
 
     return this.teamService.joinTeam(joinTeamDto);
+  }
+
+  @Get('')
+  getMyTeams(@User() user: CurrentUser) {
+    return this.teamService.getMyTeams(user.id);
   }
 }

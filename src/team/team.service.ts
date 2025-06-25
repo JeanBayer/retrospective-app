@@ -80,6 +80,27 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     }
   }
 
+  async getMyTeams(userId: string) {
+    const teams = await this.team.findMany({
+      where: {
+        memberships: {
+          some: {
+            userId,
+            status: 'ACTIVE',
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return teams;
+  }
+
   private async validateUserExistInTeam(userId: string, teamId: string) {
     return this.teamMembership.findFirst({
       where: {
