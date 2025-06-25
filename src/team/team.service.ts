@@ -100,6 +100,27 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     return teams;
   }
 
+  async leaveTeam(userId: string, teamId: string) {
+    const userAlreadyInTeam = await this.validateUserExistInTeam(
+      userId,
+      teamId,
+    );
+
+    if (!userAlreadyInTeam)
+      throw new ConflictException('User is not already a member of this team');
+
+    try {
+      await this.teamMembership.delete({
+        where: {
+          id: userAlreadyInTeam.id,
+        },
+      });
+    } catch (error) {
+      this.logger.error(error);
+      throw new ConflictException('Error while trying to leave the team.');
+    }
+  }
+
   private async validateUserExistInTeam(userId: string, teamId: string) {
     return this.teamMembership.findFirst({
       where: {
@@ -116,7 +137,7 @@ export class TeamService extends PrismaClient implements OnModuleInit {
       },
     });
 
-    if (!team) throw new Error('Team don"t found');
+    if (!team) throw new Error('Team dont found');
 
     const isPasswordEqual = compareSync(password, team.joinPassword);
     if (!isPasswordEqual) throw new Error('Invalid password team');

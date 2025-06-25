@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { User } from 'src/auth/decorators/user.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
@@ -38,5 +46,10 @@ export class TeamController {
   @Get('')
   getMyTeams(@User() user: CurrentUser) {
     return this.teamService.getMyTeams(user.id);
+  }
+
+  @Delete('/:teamId')
+  leaveTeam(@Param('teamId') teamId: string, @User() user: CurrentUser) {
+    return this.teamService.leaveTeam(user.id, teamId);
   }
 }
