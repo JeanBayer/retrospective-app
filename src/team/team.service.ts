@@ -100,6 +100,28 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     return teams;
   }
 
+  async getMyTeam(userId: string, teamId: string) {
+    const userAlreadyInTeam = await this.validateUserExistInTeam(
+      userId,
+      teamId,
+    );
+
+    if (!userAlreadyInTeam)
+      throw new ConflictException('User is not already a member of this team');
+
+    return this.team.findFirst({
+      where: {
+        id: teamId,
+      },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
   async leaveTeam(userId: string, teamId: string) {
     const userAlreadyInTeam = await this.validateUserExistInTeam(
       userId,

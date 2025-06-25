@@ -48,6 +48,11 @@ export class TeamController {
     return this.teamService.getMyTeams(user.id);
   }
 
+  @Get('/:teamId')
+  getMyTeam(@User() user: CurrentUser, @Param('teamId') teamId: string) {
+    return this.teamService.getMyTeam(user.id, teamId);
+  }
+
   @Delete('/:teamId')
   leaveTeam(@Param('teamId') teamId: string, @User() user: CurrentUser) {
     return this.teamService.leaveTeam(user.id, teamId);
