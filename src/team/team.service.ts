@@ -128,8 +128,6 @@ export class TeamService extends PrismaClient implements OnModuleInit {
   }
 
   async updateTeam(userId: string, teamId: string, updateTeam: UpdateTeamDto) {
-    await this.throwErrorIfUserDoesNotAdminInTeam(userId, teamId);
-
     let dataToUpdate: UpdateTeamDto = {};
 
     if (updateTeam?.joinPassword) {
@@ -160,6 +158,10 @@ export class TeamService extends PrismaClient implements OnModuleInit {
         updatedAt: true,
       },
     });
+  }
+
+  async userIsAdmin(userId: string, teamId: string) {
+    return this.throwErrorIfUserDoesNotAdminInTeam(userId, teamId);
   }
 
   private async throwErrorIfUserDoesNotAdminInTeam(

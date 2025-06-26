@@ -14,6 +14,7 @@ import { User } from 'src/auth/decorators/user.decorator';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { CurrentUser } from 'src/auth/interfaces/current-user.interface';
 import { validateOrThrow } from 'src/common/validate-or-throw';
+import { AdminGuard } from 'src/config/guards/admin.guard';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinPasswordTeamDto, JoinTeamDto } from './dto/join-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
@@ -67,6 +68,7 @@ export class TeamController {
     return this.teamService.leaveTeam(user.id, teamId);
   }
 
+  @UseGuards(AdminGuard)
   @Patch('/:teamId')
   updateTeam(
     @Param('teamId', ParseUUIDPipe) teamId: string,
