@@ -115,10 +115,12 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
 
     try {
-      await this.teamMembership.deleteMany({
+      await this.teamMembership.delete({
         where: {
-          teamId,
-          userId,
+          userId_teamId: {
+            teamId,
+            userId,
+          },
         },
       });
     } catch (error) {
@@ -127,7 +129,7 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async updateTeam(userId: string, teamId: string, updateTeam: UpdateTeamDto) {
+  async updateTeam(teamId: string, updateTeam: UpdateTeamDto) {
     let dataToUpdate: UpdateTeamDto = {};
 
     if (updateTeam?.joinPassword) {
@@ -156,6 +158,44 @@ export class TeamService extends PrismaClient implements OnModuleInit {
         name: true,
         createdAt: true,
         updatedAt: true,
+      },
+    });
+  }
+
+  async promoteToAdmin(userId: string, teamId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+
+    await this.teamMembership.update({
+      where: {
+        userId_teamId: {
+          userId,
+          teamId,
+        },
+      },
+      data: {
+        isAdmin: true,
+      },
+    });
+  }
+
+  async getUsers(userId: string, teamId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+
+    return await this.teamMembership.findMany({
+      where: {
+        teamId,
+      },
+      select: {
+        userId: true,
+        teamId: true,
+        isAdmin: true,
+        joinedAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
   }
