@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Logger, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Token } from './decorators/token.decorator';
-import { User } from './decorators/user.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthGuard } from './guards/auth.guard';
-import { CurrentUser } from './interfaces/current-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +25,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('verify')
-  verifyToken(@User() user: CurrentUser, @Token() token: string) {
+  verifyToken(@Token() token: string) {
     this.logger.log(`Verifying token: ${token}`);
     return this.authService.verifyToken(token);
   }

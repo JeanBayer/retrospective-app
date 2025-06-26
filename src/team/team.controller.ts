@@ -10,15 +10,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { User } from 'src/auth/decorators/user.decorator';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CurrentUser } from 'src/auth/interfaces/current-user.interface';
-import { validateOrThrow } from 'src/common/validate-or-throw';
-import { AdminGuard } from 'src/config/guards/admin.guard';
+import { User } from 'src/common/decorators/user.decorator';
+import { CurrentUser } from 'src/common/interfaces/current-user.interface';
+import { validateOrThrow } from 'src/common/validations/validate-or-throw';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinPasswordTeamDto, JoinTeamDto } from './dto/join-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamService } from './team.service';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 @Controller('team')
 @UseGuards(AuthGuard)
