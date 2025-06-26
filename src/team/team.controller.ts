@@ -4,6 +4,8 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { CurrentUser } from 'src/auth/interfaces/current-user.interface';
 import { validateOrThrow } from 'src/common/validate-or-throw';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinPasswordTeamDto, JoinTeamDto } from './dto/join-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamService } from './team.service';
 
 @Controller('team')
@@ -28,8 +31,8 @@ export class TeamController {
 
   @Post('/:teamId/join')
   joinTeam(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Body() joinTeamPasswordTeamDto: JoinPasswordTeamDto,
-    @Param('teamId') teamId: string,
     @User() user: CurrentUser,
   ) {
     const joinTeamDto: JoinTeamDto = plainToInstance(JoinTeamDto, {
@@ -49,12 +52,27 @@ export class TeamController {
   }
 
   @Get('/:teamId')
-  getMyTeam(@User() user: CurrentUser, @Param('teamId') teamId: string) {
+  getMyTeam(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @User() user: CurrentUser,
+  ) {
     return this.teamService.getMyTeam(user.id, teamId);
   }
 
   @Delete('/:teamId')
-  leaveTeam(@Param('teamId') teamId: string, @User() user: CurrentUser) {
+  leaveTeam(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @User() user: CurrentUser,
+  ) {
     return this.teamService.leaveTeam(user.id, teamId);
+  }
+
+  @Patch('/:teamId')
+  updateTeam(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Body() updateTeamDto: UpdateTeamDto,
+    @User() user: CurrentUser,
+  ) {
+    return this.teamService.updateTeam(user.id, teamId, updateTeamDto);
   }
 }
