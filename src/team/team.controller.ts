@@ -78,12 +78,21 @@ export class TeamController {
   }
 
   @UseGuards(AdminGuard)
-  @Post('/:teamId/admin')
+  @Post('/:teamId/admin/:userId')
   promoteToAdmin(
-    @Body('userId', ParseUUIDPipe) userId: string,
     @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
   ) {
     return this.teamService.promoteToAdmin(userId, teamId);
+  }
+
+  @UseGuards(AdminGuard)
+  @Delete('/:teamId/admin/:userId')
+  demoteFromAdmin(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+  ) {
+    return this.teamService.demoteFromAdmin(userId, teamId);
   }
 
   @Get('/:teamId/users')

@@ -9,7 +9,7 @@ Acciones de Usuario con la Entidad Team
 [x] 8- Cambiar la contraseña de un equipo: Actualizar la contraseña de unión de un equipo existente.
 [x] 9- Cambiar el nombre de un equipo: Modificar el nombre del equipo al que pertenezco.
 [x] 10- Hacer administrador a un miembro
-[ ] 11- Quitar a un administrador
+[x] 11- Quitar a un administrador
 
 Acceder al dashboard de un equipo: Ver la información general de un equipo específico, incluyendo sus contadores, metas y lista de miembros.
 Incrementar un contador: Aumentar el valor de un contador específico del equipo en uno.
