@@ -70,7 +70,6 @@ model Counter {
   longestStreak     Int    @default(0) @map("longest_streak")
   lastResetDuration Int    @default(0) @map("last_reset_duration")
 
-  pageTitle            String @default("Días sin evento") @map("page_title")
   incrementButtonLabel String @default("Un día más") @map("increment_button_label")
   resetButtonLabel     String @default("¡Evento!") @map("reset_button_label")
 
@@ -78,7 +77,7 @@ model Counter {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   resetRecords CounterResetRecord[]
-  goals        Goal[] // Nueva relación: un contador puede tener muchas metas asociadas
+  goals        Goal[]
 
   @@map("counters")
 }
