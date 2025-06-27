@@ -52,4 +52,13 @@ export class CounterController {
   ) {
     return this.counterService.incrementCounter(user.id, teamId, counterId);
   }
+
+  @Post('/:counterId/reset')
+  resetCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.counterService.resetCounter(user.id, teamId, counterId);
+  }
 }

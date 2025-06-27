@@ -51,8 +51,8 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
-    const alreadyIncrementedToday =
-      await this.hasCounterBeenIncrementedToday(counterId);
+    const alreadyModifiedToday =
+      await this.hasCounterBeenModifiedToday(counterId);
 
     const counter = await this.counter.findFirst({
       where: {
@@ -63,17 +63,17 @@ export class CounterService extends PrismaClient implements OnModuleInit {
 
     if (!counter) throw new NotFoundException('Counter don`t found');
 
-    return { ...counter, alreadyIncrementedToday };
+    return { ...counter, alreadyModifiedToday };
   }
 
   async incrementCounter(userId: string, teamId: string, counterId: string) {
     await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
-    const alreadyIncrementedToday =
-      await this.hasCounterBeenIncrementedToday(counterId);
+    const alreadyModifiedToday =
+      await this.hasCounterBeenModifiedToday(counterId);
 
-    if (alreadyIncrementedToday)
+    if (alreadyModifiedToday)
       throw new ConflictException(
         'The counter has already been incremented today',
       );
@@ -91,7 +91,74 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       }),
     ]);
 
-    return counter;
+    return { ...counter, alreadyModifiedToday: true };
+  }
+
+  async resetCounter(userId: string, teamId: string, counterId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
+
+    const alreadyModifiedToday =
+      await this.hasCounterBeenModifiedToday(counterId);
+
+    if (alreadyModifiedToday)
+      throw new ConflictException(
+        'The counter has already been incremented today',
+      );
+
+    const { currentCount, lastResetDuration, longestStreak } =
+      await this.handleResetData(counterId, teamId);
+
+    const [counter] = await this.$transaction([
+      this.counter.update({
+        where: { id: counterId, teamId },
+        data: {
+          currentCount: { set: currentCount },
+          lastResetDuration: {
+            set: lastResetDuration,
+          },
+          longestStreak: {
+            set: longestStreak,
+          },
+        },
+      }),
+      this.counterIncrementRecord.create({
+        data: {
+          counterId,
+          incrementedAt: this.getToday(),
+        },
+      }),
+      this.counterResetRecord.create({
+        data: {
+          counterId,
+          countBeforeReset: lastResetDuration,
+        },
+      }),
+    ]);
+
+    return { ...counter, alreadyModifiedToday: true };
+  }
+
+  private async handleResetData(counterId: string, teamId: string) {
+    const prevCounter = await this.counter.findFirst({
+      where: {
+        id: counterId,
+        teamId,
+      },
+    });
+
+    if (!prevCounter) throw new NotFoundException('');
+
+    const { longestStreak: prevLongestStreak, currentCount: prevCurrentCount } =
+      prevCounter;
+
+    const longestStreak = Math.max(prevLongestStreak, prevCurrentCount);
+
+    return {
+      currentCount: 0,
+      lastResetDuration: prevCurrentCount,
+      longestStreak,
+    };
   }
 
   private getToday() {
@@ -101,7 +168,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return today;
   }
 
-  private async hasCounterBeenIncrementedToday(counterId: string) {
+  private async hasCounterBeenModifiedToday(counterId: string) {
     const alreadyIncremented = await this.counterIncrementRecord.count({
       where: {
         counterId,
