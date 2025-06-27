@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
@@ -44,6 +45,21 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     });
 
     return counters;
+  }
+
+  async getCounter(userId: string, teamId: string, counterId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+
+    const counter = await this.counter.findFirst({
+      where: {
+        id: counterId,
+        teamId,
+      },
+    });
+
+    if (!counter) throw new NotFoundException('Counter don`t found');
+
+    return counter;
   }
 
   private async throwErrorIfUserDoesNotExistInTeam(

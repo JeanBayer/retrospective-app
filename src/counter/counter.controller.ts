@@ -34,4 +34,13 @@ export class CounterController {
   ) {
     return this.counterService.createCounter(user.id, teamId, createCounterDto);
   }
+
+  @Get('/:counterId')
+  getCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.counterService.getCounter(user.id, teamId, counterId);
+  }
 }
