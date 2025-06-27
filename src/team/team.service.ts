@@ -194,6 +194,19 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  async leaveUserFromTeam(userId: string, teamId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+
+    await this.teamMembership.delete({
+      where: {
+        userId_teamId: {
+          userId,
+          teamId,
+        },
+      },
+    });
+  }
+
   async getUsers(userId: string, teamId: string) {
     await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
 

@@ -102,4 +102,13 @@ export class TeamController {
   ) {
     return this.teamService.getUsers(user.id, teamId);
   }
+
+  @UseGuards(AdminGuard)
+  @Delete('/:teamId/user/:userId')
+  leaveUserFromTeam(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+  ) {
+    return this.teamService.leaveUserFromTeam(userId, teamId);
+  }
 }
