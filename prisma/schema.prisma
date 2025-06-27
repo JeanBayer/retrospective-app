@@ -76,10 +76,21 @@ model Counter {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  resetRecords CounterResetRecord[]
-  goals        Goal[]
+  resetRecords           CounterResetRecord[]
+  goals                  Goal[]
+  CounterIncrementRecord CounterIncrementRecord[]
 
   @@map("counters")
+}
+
+model CounterIncrementRecord {
+  id            String   @id @default(uuid()) @map("increment_id")
+  counterId     String   @map("counter_id")
+  counter       Counter  @relation(fields: [counterId], references: [id])
+  incrementedAt DateTime @map("incremented_at") @db.Date
+
+  @@unique([counterId, incrementedAt])
+  @@map("counter_increment_records")
 }
 
 model CounterResetRecord {

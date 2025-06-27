@@ -43,4 +43,13 @@ export class CounterController {
   ) {
     return this.counterService.getCounter(user.id, teamId, counterId);
   }
+
+  @Post('/:counterId/increment')
+  incrementCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.counterService.incrementCounter(user.id, teamId, counterId);
+  }
 }
