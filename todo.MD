@@ -5,6 +5,7 @@ Acciones de Usuario con la Entidad Team
 [x] 1- Registrar una cuenta de usuario: Crear una cuenta personal con email, nombre y contraseña.
 [x] 2- Iniciar sesión: Acceder a la cuenta de usuario con email y contraseña.
 
+
 ## Team
 
 [x] 1- Crear un nuevo equipo: Después de iniciar sesión, crear un nuevo equipo con un nombre y una contraseña para unirse, y automáticamente ser su administrador.
@@ -16,14 +17,20 @@ Acciones de Usuario con la Entidad Team
 [x] 7- Cambiar el nombre de un equipo: Modificar el nombre del equipo al que pertenezco.
 [x] 8- Hacer administrador a un miembro
 [x] 9- Quitar a un administrador
-[] 10- Quitar a un miembro: Eliminar a un miembro del equipo, ya sea administrador o no.
+[x] 10- Quitar a un miembro: Eliminar a un miembro del equipo, ya sea administrador o no.
 
-Acceder al dashboard de un equipo: Ver la información general de un equipo específico, incluyendo sus contadores, metas y lista de miembros.
-Incrementar un contador: Aumentar el valor de un contador específico del equipo en uno.
-Reiniciar un contador: Registrar un evento/incidente para un contador específico, reiniciándolo y actualizando sus récords.
-Ver metas del contador: Ver las metas asociadas a un contador específico.
-Iniciar una sesión de retrospectiva: Abrir una nueva sesión de retrospectiva para el equipo.
-Enviar agradecimientos: Dar uno o varios agradecimientos a compañeros o al equipo en general durante una retrospectiva.
-Votar por el "Elegido del Sprint": Emitir un voto anónimo por un compañero de equipo en una retrospectiva.
-Ver el ranking de agradecimientos: Consultar el ranking de los miembros del equipo por la cantidad total de agradecimientos recibidos.
-Ver el ranking del "Elegido del Sprint": Consultar el ranking de los miembros del equipo por el número de veces que han ganado el "Elegido del Sprint".
+
+## Counter
+
+[x] 1- Crear counter a un equipo
+[x] 2- listar counters de un equipo
+[] 3- buscar un counter de un equipo
+[] 4- reset counter de un equipo
+[] 5- increment counter de un equipo
+[] 6- editar counter de un equipo [ADMIN]
+[] 7- eliminar counter de un equipo [ADMIN]
+[] 8- crear meta a un counter
+[] 9- listar metas de un counter
+[] 10- buscar la meta de un counter
+[] 11- editar meta de un equipo [ADMIN]
+[] 12- eliminar meta de un equipo [ADMIN]
