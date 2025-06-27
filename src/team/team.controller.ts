@@ -20,17 +20,30 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { AdminGuard } from './guards/admin.guard';
 import { TeamService } from './team.service';
 
-@Controller('team')
+@Controller('teams')
 @UseGuards(AuthGuard)
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
+
+  @Get('')
+  getMyTeams(@User() user: CurrentUser) {
+    return this.teamService.getMyTeams(user.id);
+  }
 
   @Post('')
   createTeam(@Body() createTeamDto: CreateTeamDto, @User() user: CurrentUser) {
     return this.teamService.createTeam(createTeamDto, user.id);
   }
 
-  @Post('/:teamId/join')
+  @Get('/:teamId')
+  getMyTeam(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.teamService.getMyTeam(user.id, teamId);
+  }
+
+  @Post('/:teamId')
   joinTeam(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @Body() joinTeamPasswordTeamDto: JoinPasswordTeamDto,
@@ -47,17 +60,13 @@ export class TeamController {
     return this.teamService.joinTeam(joinTeamDto);
   }
 
-  @Get('')
-  getMyTeams(@User() user: CurrentUser) {
-    return this.teamService.getMyTeams(user.id);
-  }
-
-  @Get('/:teamId')
-  getMyTeam(
+  @UseGuards(AdminGuard)
+  @Patch('/:teamId')
+  updateTeam(
     @Param('teamId', ParseUUIDPipe) teamId: string,
-    @User() user: CurrentUser,
+    @Body() updateTeamDto: UpdateTeamDto,
   ) {
-    return this.teamService.getMyTeam(user.id, teamId);
+    return this.teamService.updateTeam(teamId, updateTeamDto);
   }
 
   @Delete('/:teamId')
@@ -69,16 +78,7 @@ export class TeamController {
   }
 
   @UseGuards(AdminGuard)
-  @Patch('/:teamId')
-  updateTeam(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
-    @Body() updateTeamDto: UpdateTeamDto,
-  ) {
-    return this.teamService.updateTeam(teamId, updateTeamDto);
-  }
-
-  @UseGuards(AdminGuard)
-  @Post('/:teamId/admin/:userId')
+  @Post('/:teamId/users/:userId/admin')
   promoteToAdmin(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('userId', ParseUUIDPipe) userId: string,
@@ -87,7 +87,7 @@ export class TeamController {
   }
 
   @UseGuards(AdminGuard)
-  @Delete('/:teamId/admin/:userId')
+  @Delete('/:teamId/users/:userId/admin')
   demoteFromAdmin(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('teamId', ParseUUIDPipe) teamId: string,
@@ -104,7 +104,7 @@ export class TeamController {
   }
 
   @UseGuards(AdminGuard)
-  @Delete('/:teamId/user/:userId')
+  @Delete('/:teamId/users/:userId')
   leaveUserFromTeam(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('teamId', ParseUUIDPipe) teamId: string,
