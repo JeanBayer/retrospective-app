@@ -19,11 +19,14 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  memberships       TeamMembership[]
-  thankYousGiven    ThankYou[]       @relation("GivenThankYous")
-  thankYousReceived ThankYou[]       @relation("ReceivedThankYous")
+  memberships TeamMembership[]
 
-  votedForRetrospectives       Retrospective[] @relation("Voters")
+  thankYousGiven    ThankYou[] @relation("GivenThankYous")
+  thankYousReceived ThankYou[] @relation("ReceivedThankYous")
+
+  votesGiven    Vote[] @relation("VotesGiven")
+  votesReceived Vote[] @relation("VotesReceived")
+
   sprintWinnerOfRetrospectives Retrospective[] @relation("SprintWinner")
 
   @@map("users")
@@ -113,7 +116,7 @@ model Goal {
   achieved    Boolean   @default(false)
   achievedAt  DateTime? @map("achieved_at")
 
-  counterId String  @map("counter_id") // Clave foránea para el Counter
+  counterId String  @map("counter_id")
   counter   Counter @relation(fields: [counterId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -122,24 +125,50 @@ model Goal {
   @@map("goals")
 }
 
+enum RetrospectiveStatus {
+  CREATED
+  CLOSED
+}
+
 model Retrospective {
   id     String @id @default(uuid()) @map("retrospective_id")
   teamId String @map("team_id")
   team   Team   @relation(fields: [teamId], references: [id])
 
-  retrospectiveNumber Int @map("retrospective_number")
+  retrospectiveName   String @map("retrospective_name")
+  retrospectiveNumber Int    @map("retrospective_number")
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  voters User[] @relation("Voters")
+  votes Vote[]
 
   sprintWinnerId String? @map("sprint_winner_id")
   sprintWinner   User?   @relation("SprintWinner", fields: [sprintWinnerId], references: [id])
+
+  status RetrospectiveStatus @default(CREATED) @map("status")
 
   thankYous ThankYou[]
 
   @@unique([teamId, retrospectiveNumber])
   @@map("retrospectives")
+}
+
+model Vote {
+  id String @id @default(uuid()) @map("vote_id")
+
+  voterId String @map("voter_id")
+  voter   User   @relation("VotesGiven", fields: [voterId], references: [id])
+
+  retrospectiveId String        @map("retrospective_id")
+  retrospective   Retrospective @relation(fields: [retrospectiveId], references: [id])
+
+  votedForId String @map("voted_for_id")
+  votedFor   User   @relation("VotesReceived", fields: [votedForId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([voterId, retrospectiveId])
+  @@map("votes")
 }
 
 model ThankYou {

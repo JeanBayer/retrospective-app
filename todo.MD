@@ -41,6 +41,7 @@
 [x] 6- reactivar meta de un counter. [REF] [ADMIN] [GOAL_EXIST_IN_COUNTER]
 [x] 7- clonar meta de un counter. [REF] [GOAL_EXIST_IN_COUNTER]
 
-## Retrospective
+## Retrospective [AUTH] [USER_EXIST_IN_TEAM]
 
-[] 1- Crear una retrospectiva
+[x] 1- Crear una retrospectiva a un equipo. [REF]
+[x] 2- Consultar las retrospectivas de un equipo. [REF]
