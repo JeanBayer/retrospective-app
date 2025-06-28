@@ -26,7 +26,7 @@ Acciones de Usuario con la Entidad Team
 [x] 4- increment counter de un equipo
 [x] 5- reset counter de un equipo
 [x] 6- editar counter de un equipo [ADMIN]
-[] 7- eliminar counter de un equipo [ADMIN]
+[x] 7- eliminar counter de un equipo [ADMIN]
 
 [] 8- crear meta a un counter
 [] 9- listar metas de un counter

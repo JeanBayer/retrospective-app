@@ -34,7 +34,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
     });
 
-    return counter;
+    return { ...counter, alreadyModifiedToday: false };
   }
 
   async updateCounter(
@@ -58,6 +58,19 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     });
 
     return { ...counter, alreadyModifiedToday };
+  }
+
+  async deleteCounter(userId: string, teamId: string, counterId: string) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
+
+    await this.counter.delete({
+      where: {
+        id: counterId,
+      },
+    });
+
+    return;
   }
 
   async getCounters(userId: string, teamId: string) {

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -11,6 +12,7 @@ import {
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { User } from 'src/common/decorators/user.decorator';
 import { CurrentUser } from 'src/common/interfaces/current-user.interface';
+import { AdminGuard } from 'src/team/guards/admin.guard';
 import { CounterService } from './counter.service';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { ResetCounterDto } from './dto/reset-counter.dto';
@@ -60,6 +62,16 @@ export class CounterController {
       counterId,
       updateCounterDto,
     );
+  }
+
+  @UseGuards(AdminGuard)
+  @Delete('/:counterId')
+  deleteCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.counterService.deleteCounter(user.id, teamId, counterId);
   }
 
   @Post('/:counterId/increment')

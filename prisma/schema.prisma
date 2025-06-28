@@ -86,7 +86,7 @@ model Counter {
 model CounterIncrementRecord {
   id            String   @id @default(uuid()) @map("increment_id")
   counterId     String   @map("counter_id")
-  counter       Counter  @relation(fields: [counterId], references: [id])
+  counter       Counter  @relation(fields: [counterId], references: [id], onDelete: Cascade)
   incrementedAt DateTime @map("incremented_at") @db.Date
 
   @@unique([counterId, incrementedAt])
@@ -96,7 +96,7 @@ model CounterIncrementRecord {
 model CounterResetRecord {
   id        String  @id @default(uuid()) @map("record_id")
   counterId String  @map("counter_id")
-  counter   Counter @relation(fields: [counterId], references: [id])
+  counter   Counter @relation(fields: [counterId], references: [id], onDelete: Cascade)
 
   countBeforeReset Int      @map("count_before_reset")
   nameResetEvent   String   @map("name_reset_event")
@@ -114,7 +114,7 @@ model Goal {
   achievedAt  DateTime? @map("achieved_at")
 
   counterId String  @map("counter_id") // Clave foránea para el Counter
-  counter   Counter @relation(fields: [counterId], references: [id])
+  counter   Counter @relation(fields: [counterId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
