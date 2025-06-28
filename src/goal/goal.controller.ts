@@ -8,9 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CounterExistInTeam } from 'src/counter/guards/counter-exist-in-team.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { GoalService } from './goal.service';
+import { GoalExistInCounter } from './guards/goal-exist-in-counter.guard';
 
 @Controller('teams/:teamId/counters/:counterId/goals')
 @UseGuards(AuthGuard)
@@ -19,30 +21,26 @@ export class GoalController {
 
   @Post('')
   @UseGuards(UserExistInTeam)
+  @UseGuards(CounterExistInTeam)
   createGoal(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('counterId', ParseUUIDPipe) counterId: string,
     @Body() createGoalDto: CreateGoalDto,
   ) {
-    return this.goalService.createGoal(teamId, counterId, createGoalDto);
+    return this.goalService.createGoal(counterId, createGoalDto);
   }
 
   @Get('')
   @UseGuards(UserExistInTeam)
-  getGoals(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
-    @Param('counterId', ParseUUIDPipe) counterId: string,
-  ) {
-    return this.goalService.getGoals(teamId, counterId);
+  @UseGuards(CounterExistInTeam)
+  getGoals(@Param('counterId', ParseUUIDPipe) counterId: string) {
+    return this.goalService.getGoals(counterId);
   }
 
   @Get('/:goalId')
   @UseGuards(UserExistInTeam)
-  getGoal(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
-    @Param('counterId', ParseUUIDPipe) counterId: string,
-    @Param('goalId', ParseUUIDPipe) goalId: string,
-  ) {
-    return this.goalService.getGoal(teamId, counterId, goalId);
+  @UseGuards(CounterExistInTeam)
+  @UseGuards(GoalExistInCounter)
+  getGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
+    return this.goalService.getGoal(goalId);
   }
 }

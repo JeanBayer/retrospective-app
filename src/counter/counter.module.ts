@@ -9,5 +9,6 @@ import { CounterService } from './counter.service';
   controllers: [CounterController],
   providers: [CounterService],
   imports: [AuthModule, TeamModule, MembershipModule],
+  exports: [CounterService],
 })
 export class CounterModule {}

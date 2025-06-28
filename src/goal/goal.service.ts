@@ -15,13 +15,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  async createGoal(
-    teamId: string,
-    counterId: string,
-    createGoalDto: CreateGoalDto,
-  ) {
-    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
-
+  async createGoal(counterId: string, createGoalDto: CreateGoalDto) {
     const { description, targetDays } = createGoalDto;
 
     const goal = await this.goal.create({
@@ -35,9 +29,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
-  async getGoals(teamId: string, counterId: string) {
-    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
-
+  async getGoals(counterId: string) {
     const goals = await this.goal.findMany({
       where: {
         counterId,
@@ -47,10 +39,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goals;
   }
 
-  async getGoal(teamId: string, counterId: string, goalId: string) {
-    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
-    await this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
-
+  async getGoal(goalId: string) {
     const goal = await this.goal.findFirst({
       where: {
         id: goalId,
@@ -60,18 +49,8 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
-  private async throwErrorIfCounterDoesNotExistInTeam(
-    teamId: string,
-    counterId: string,
-  ) {
-    const counter = await this.counter.count({
-      where: {
-        id: counterId,
-        teamId,
-      },
-    });
-
-    if (!counter) throw new NotFoundException('Counter don`t found');
+  async goalExistInCounter(goalId: string, counterId: string) {
+    return this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
   }
 
   private async throwErrorIfGoalDoesNotExistInCounter(
