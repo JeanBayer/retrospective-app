@@ -51,6 +51,25 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goals;
   }
 
+  async getGoal(
+    userId: string,
+    teamId: string,
+    counterId: string,
+    goalId: string,
+  ) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
+    await this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
+
+    const goal = await this.goal.findFirst({
+      where: {
+        id: goalId,
+      },
+    });
+
+    return goal;
+  }
+
   private async throwErrorIfUserDoesNotExistInTeam(
     userId: string,
     teamId: string,
@@ -80,5 +99,19 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     });
 
     if (!counter) throw new NotFoundException('Counter don`t found');
+  }
+
+  private async throwErrorIfGoalDoesNotExistInCounter(
+    goalId: string,
+    counterId: string,
+  ) {
+    const goal = await this.goal.count({
+      where: {
+        id: goalId,
+        counterId,
+      },
+    });
+
+    if (!goal) throw new NotFoundException('Goal don`t found');
   }
 }

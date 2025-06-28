@@ -41,4 +41,14 @@ export class GoalController {
   ) {
     return this.goalService.getGoals(user.id, teamId, counterId);
   }
+
+  @Get('/:goalId')
+  getGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @Param('goalId', ParseUUIDPipe) goalId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.goalService.getGoal(user.id, teamId, counterId, goalId);
+  }
 }
