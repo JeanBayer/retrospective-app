@@ -8,6 +8,7 @@ import {
 import { PrismaClient } from 'generated/prisma';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { ResetCounterDto } from './dto/reset-counter.dto';
+import { UpdateCounterDto } from './dto/update-counter.dto';
 
 @Injectable()
 export class CounterService extends PrismaClient implements OnModuleInit {
@@ -34,6 +35,29 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     });
 
     return counter;
+  }
+
+  async updateCounter(
+    userId: string,
+    teamId: string,
+    counterId: string,
+    updateCounterDto: UpdateCounterDto,
+  ) {
+    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+    await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
+    const alreadyModifiedToday =
+      await this.hasCounterBeenModifiedToday(counterId);
+
+    const counter = await this.counter.update({
+      where: {
+        id: counterId,
+      },
+      data: {
+        ...updateCounterDto,
+      },
+    });
+
+    return { ...counter, alreadyModifiedToday };
   }
 
   async getCounters(userId: string, teamId: string) {

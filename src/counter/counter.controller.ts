@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { CurrentUser } from 'src/common/interfaces/current-user.interface';
 import { CounterService } from './counter.service';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { ResetCounterDto } from './dto/reset-counter.dto';
+import { UpdateCounterDto } from './dto/update-counter.dto';
 
 @Controller('teams/:teamId/counters')
 @UseGuards(AuthGuard)
@@ -29,8 +31,8 @@ export class CounterController {
 
   @Post('')
   createTeam(
-    @Body() createCounterDto: CreateCounterDto,
     @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Body() createCounterDto: CreateCounterDto,
     @User() user: CurrentUser,
   ) {
     return this.counterService.createCounter(user.id, teamId, createCounterDto);
@@ -43,6 +45,21 @@ export class CounterController {
     @User() user: CurrentUser,
   ) {
     return this.counterService.getCounter(user.id, teamId, counterId);
+  }
+
+  @Patch('/:counterId')
+  updateCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+    @Body() updateCounterDto: UpdateCounterDto,
+    @User() user: CurrentUser,
+  ) {
+    return this.counterService.updateCounter(
+      user.id,
+      teamId,
+      counterId,
+      updateCounterDto,
+    );
   }
 
   @Post('/:counterId/increment')

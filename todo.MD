@@ -5,7 +5,6 @@ Acciones de Usuario con la Entidad Team
 [x] 1- Registrar una cuenta de usuario: Crear una cuenta personal con email, nombre y contraseña.
 [x] 2- Iniciar sesión: Acceder a la cuenta de usuario con email y contraseña.
 
-
 ## Team
 
 [x] 1- Crear un nuevo equipo: Después de iniciar sesión, crear un nuevo equipo con un nombre y una contraseña para unirse, y automáticamente ser su administrador.
@@ -19,7 +18,6 @@ Acciones de Usuario con la Entidad Team
 [x] 9- Quitar a un administrador
 [x] 10- Quitar a un miembro: Eliminar a un miembro del equipo, ya sea administrador o no.
 
-
 ## Counter
 
 [x] 1- Crear counter a un equipo
@@ -27,7 +25,7 @@ Acciones de Usuario con la Entidad Team
 [x] 3- buscar un counter de un equipo
 [x] 4- increment counter de un equipo
 [x] 5- reset counter de un equipo
-[] 6- editar counter de un equipo [ADMIN]
+[x] 6- editar counter de un equipo [ADMIN]
 [] 7- eliminar counter de un equipo [ADMIN]
 
 [] 8- crear meta a un counter
