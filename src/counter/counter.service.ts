@@ -17,13 +17,8 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  async createCounter(
-    userId: string,
-    teamId: string,
-    createCounterDto: CreateCounterDto,
-  ) {
+  async createCounter(teamId: string, createCounterDto: CreateCounterDto) {
     const { name, incrementButtonLabel, resetButtonLabel } = createCounterDto;
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
 
     const counter = await this.counter.create({
       data: {
@@ -38,12 +33,10 @@ export class CounterService extends PrismaClient implements OnModuleInit {
   }
 
   async updateCounter(
-    userId: string,
     teamId: string,
     counterId: string,
     updateCounterDto: UpdateCounterDto,
   ) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
     const alreadyModifiedToday =
       await this.hasCounterBeenModifiedToday(counterId);
@@ -60,8 +53,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return { ...counter, alreadyModifiedToday };
   }
 
-  async deleteCounter(userId: string, teamId: string, counterId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+  async deleteCounter(teamId: string, counterId: string) {
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     await this.counter.delete({
@@ -73,9 +65,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return;
   }
 
-  async getCounters(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
+  async getCounters(teamId: string) {
     const counters = await this.counter.findMany({
       where: {
         teamId,
@@ -100,8 +90,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return countWithModifiedStatus;
   }
 
-  async getCounter(userId: string, teamId: string, counterId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+  async getCounter(teamId: string, counterId: string) {
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     const alreadyModifiedToday =
@@ -119,8 +108,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return { ...counter, alreadyModifiedToday };
   }
 
-  async incrementCounter(userId: string, teamId: string, counterId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+  async incrementCounter(teamId: string, counterId: string) {
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     const alreadyModifiedToday =
@@ -148,12 +136,10 @@ export class CounterService extends PrismaClient implements OnModuleInit {
   }
 
   async resetCounter(
-    userId: string,
     teamId: string,
     counterId: string,
     resetCounterDto: ResetCounterDto,
   ) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     const alreadyModifiedToday =
@@ -242,23 +228,6 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     }
 
     return true;
-  }
-
-  private async throwErrorIfUserDoesNotExistInTeam(
-    userId: string,
-    teamId: string,
-  ) {
-    const userAlreadyInTeam = await this.teamMembership.findFirst({
-      where: {
-        userId,
-        teamId,
-      },
-    });
-
-    if (!userAlreadyInTeam)
-      throw new ConflictException('User is not already a member of this team');
-
-    return userAlreadyInTeam;
   }
 
   private async throwErrorIfCounterDoesNotExistInTeam(
