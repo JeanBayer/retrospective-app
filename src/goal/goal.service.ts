@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -17,12 +16,10 @@ export class GoalService extends PrismaClient implements OnModuleInit {
   }
 
   async createGoal(
-    userId: string,
     teamId: string,
     counterId: string,
     createGoalDto: CreateGoalDto,
   ) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     const { description, targetDays } = createGoalDto;
@@ -38,8 +35,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
-  async getGoals(userId: string, teamId: string, counterId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+  async getGoals(teamId: string, counterId: string) {
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
     const goals = await this.goal.findMany({
@@ -51,13 +47,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goals;
   }
 
-  async getGoal(
-    userId: string,
-    teamId: string,
-    counterId: string,
-    goalId: string,
-  ) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
+  async getGoal(teamId: string, counterId: string, goalId: string) {
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
     await this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
 
@@ -68,23 +58,6 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     });
 
     return goal;
-  }
-
-  private async throwErrorIfUserDoesNotExistInTeam(
-    userId: string,
-    teamId: string,
-  ) {
-    const userAlreadyInTeam = await this.teamMembership.findFirst({
-      where: {
-        userId,
-        teamId,
-      },
-    });
-
-    if (!userAlreadyInTeam)
-      throw new ConflictException('User is not already a member of this team');
-
-    return userAlreadyInTeam;
   }
 
   private async throwErrorIfCounterDoesNotExistInTeam(
