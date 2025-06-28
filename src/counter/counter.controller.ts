@@ -12,6 +12,7 @@ import { User } from 'src/common/decorators/user.decorator';
 import { CurrentUser } from 'src/common/interfaces/current-user.interface';
 import { CounterService } from './counter.service';
 import { CreateCounterDto } from './dto/create-counter.dto';
+import { ResetCounterDto } from './dto/reset-counter.dto';
 
 @Controller('teams/:teamId/counters')
 @UseGuards(AuthGuard)
@@ -57,8 +58,14 @@ export class CounterController {
   resetCounter(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('counterId', ParseUUIDPipe) counterId: string,
+    @Body() resetCounterDto: ResetCounterDto,
     @User() user: CurrentUser,
   ) {
-    return this.counterService.resetCounter(user.id, teamId, counterId);
+    return this.counterService.resetCounter(
+      user.id,
+      teamId,
+      counterId,
+      resetCounterDto,
+    );
   }
 }

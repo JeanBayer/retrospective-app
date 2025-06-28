@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { CreateCounterDto } from './dto/create-counter.dto';
+import { ResetCounterDto } from './dto/reset-counter.dto';
 
 @Injectable()
 export class CounterService extends PrismaClient implements OnModuleInit {
@@ -75,7 +76,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
 
     if (alreadyModifiedToday)
       throw new ConflictException(
-        'The counter has already been incremented today',
+        'The counter has already been modified today',
       );
 
     const [counter] = await this.$transaction([
@@ -94,7 +95,12 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return { ...counter, alreadyModifiedToday: true };
   }
 
-  async resetCounter(userId: string, teamId: string, counterId: string) {
+  async resetCounter(
+    userId: string,
+    teamId: string,
+    counterId: string,
+    resetCounterDto: ResetCounterDto,
+  ) {
     await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
     await this.throwErrorIfCounterDoesNotExistInTeam(teamId, counterId);
 
@@ -103,7 +109,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
 
     if (alreadyModifiedToday)
       throw new ConflictException(
-        'The counter has already been incremented today',
+        'The counter has already been modified today',
       );
 
     const { currentCount, lastResetDuration, longestStreak } =
@@ -122,16 +128,12 @@ export class CounterService extends PrismaClient implements OnModuleInit {
           },
         },
       }),
-      this.counterIncrementRecord.create({
-        data: {
-          counterId,
-          incrementedAt: this.getToday(),
-        },
-      }),
       this.counterResetRecord.create({
         data: {
           counterId,
           countBeforeReset: lastResetDuration,
+          resetOccurredAt: this.getToday(),
+          nameResetEvent: resetCounterDto.nameEvent,
         },
       }),
     ]);
@@ -169,14 +171,25 @@ export class CounterService extends PrismaClient implements OnModuleInit {
   }
 
   private async hasCounterBeenModifiedToday(counterId: string) {
-    const alreadyIncremented = await this.counterIncrementRecord.count({
+    const alreadyIncrementedCount = await this.counterIncrementRecord.count({
       where: {
         counterId,
         incrementedAt: this.getToday(),
       },
     });
 
-    return alreadyIncremented > 0;
+    if (alreadyIncrementedCount < 1) {
+      const alreadyResetCount = await this.counterResetRecord.count({
+        where: {
+          counterId,
+          resetOccurredAt: this.getToday(),
+        },
+      });
+
+      return alreadyResetCount > 0;
+    }
+
+    return true;
   }
 
   private async throwErrorIfUserDoesNotExistInTeam(

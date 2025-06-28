@@ -99,8 +99,10 @@ model CounterResetRecord {
   counter   Counter @relation(fields: [counterId], references: [id])
 
   countBeforeReset Int      @map("count_before_reset")
-  resetOccurredAt  DateTime @default(now()) @map("reset_occurred_at")
+  nameResetEvent   String   @map("name_reset_event")
+  resetOccurredAt  DateTime @map("reset_occurred_at") @db.Date
 
+  @@unique([counterId, resetOccurredAt])
   @@map("counter_reset_records")
 }
 
