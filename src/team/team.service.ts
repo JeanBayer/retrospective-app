@@ -153,77 +153,8 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async promoteToAdmin(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
-    await this.teamMembership.update({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId,
-        },
-      },
-      data: {
-        isAdmin: true,
-      },
-    });
-  }
-
-  async demoteFromAdmin(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
-    await this.teamMembership.update({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId,
-        },
-      },
-      data: {
-        isAdmin: false,
-      },
-    });
-  }
-
-  async leaveUserFromTeam(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
-    await this.teamMembership.delete({
-      where: {
-        userId_teamId: {
-          userId,
-          teamId,
-        },
-      },
-    });
-  }
-
-  async getUsers(teamId: string) {
-    return await this.teamMembership.findMany({
-      where: {
-        teamId,
-      },
-      select: {
-        userId: true,
-        teamId: true,
-        isAdmin: true,
-        joinedAt: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-  }
-
   async userIsAdmin(userId: string, teamId: string) {
     return this.throwErrorIfUserDoesNotAdminInTeam(userId, teamId);
-  }
-
-  async userExistInTeam(userId: string, teamId: string) {
-    return this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
   }
 
   private async throwErrorIfUserDoesNotAdminInTeam(
@@ -255,23 +186,6 @@ export class TeamService extends PrismaClient implements OnModuleInit {
       throw new ConflictException('User is already a member of this team');
 
     return null;
-  }
-
-  private async throwErrorIfUserDoesNotExistInTeam(
-    userId: string,
-    teamId: string,
-  ) {
-    const userAlreadyInTeam = await this.teamMembership.findFirst({
-      where: {
-        userId,
-        teamId,
-      },
-    });
-
-    if (!userAlreadyInTeam)
-      throw new ConflictException('User is not already a member of this team');
-
-    return userAlreadyInTeam;
   }
 
   private async throwErrorIfPasswordDoesNotExistInTeam(

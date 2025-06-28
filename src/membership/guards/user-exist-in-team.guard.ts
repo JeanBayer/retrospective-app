@@ -4,11 +4,11 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { TeamService } from 'src/team/team.service';
+import { MembershipService } from '../membership.service';
 
 @Injectable()
 export class UserExistInTeam implements CanActivate {
-  constructor(private readonly teamService: TeamService) {}
+  constructor(private readonly membershipService: MembershipService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -25,7 +25,7 @@ export class UserExistInTeam implements CanActivate {
     }
 
     try {
-      await this.teamService.userExistInTeam(user?.id, teamId);
+      await this.membershipService.userExistInTeam(user?.id, teamId);
     } catch {
       throw new ForbiddenException("User doesn't exist in this team");
     }
