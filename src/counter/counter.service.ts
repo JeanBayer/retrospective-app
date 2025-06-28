@@ -120,6 +120,20 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       }),
     ]);
 
+    await this.goal.updateMany({
+      where: {
+        counterId,
+        achieved: false,
+        targetDays: {
+          lte: counter.currentCount,
+        },
+      },
+      data: {
+        achieved: true,
+        achievedAt: this.getToday(true),
+      },
+    });
+
     return { ...counter, alreadyModifiedToday: true };
   }
 
@@ -186,9 +200,9 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     };
   }
 
-  private getToday() {
+  private getToday(inRealTime: boolean = false) {
     const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    if (!inRealTime) today.setUTCHours(0, 0, 0, 0);
 
     return today;
   }

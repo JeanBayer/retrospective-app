@@ -28,7 +28,7 @@
 [x] 4- updateCounter: editar counter de un equipo. [REF] [ADMIN] [COUNTER_EXIST_TEAM]
 [x] 5- deleteCounter: eliminar counter de un equipo. [REF] [ADMIN] [COUNTER_EXIST_TEAM]
 [x] 6- incrementCounter: increment counter de un equipo. [REF] [COUNTER_EXIST_TEAM]
-[x] [] 6A- al incrementar un counter se revisa si cumplió una meta (archived: false) y si es el caso se marca como cumplida
+[x] [x] 6A- al incrementar un counter se revisa si cumplió una meta (archived: false) y si es el caso se marca como cumplida
 [x] 7- resetCounter: reset counter de un equipo. [REF] [COUNTER_EXIST_TEAM]
 
 ## Goal [AUTH] [USER_EXIST_TEAM] [COUNTER_EXIST_TEAM]
