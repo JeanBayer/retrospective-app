@@ -7,6 +7,7 @@ import {
 import { PrismaClient } from 'generated/prisma';
 import { CounterService } from 'src/counter/counter.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
+import { UpdateGoalDto } from './dto/update-goal.dto';
 
 @Injectable()
 export class GoalService extends PrismaClient implements OnModuleInit {
@@ -43,6 +44,19 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     const goal = await this.goal.findFirst({
       where: {
         id: goalId,
+      },
+    });
+
+    return goal;
+  }
+
+  async updateGoal(goalId: string, updateGoalDto: UpdateGoalDto) {
+    const goal = await this.goal.update({
+      where: {
+        id: goalId,
+      },
+      data: {
+        ...updateGoalDto,
       },
     });
 

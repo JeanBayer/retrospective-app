@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { CounterExistInTeam } from 'src/counter/guards/counter-exist-in-team.gua
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { AdminGuard } from 'src/team/guards/admin.guard';
 import { CreateGoalDto } from './dto/create-goal.dto';
+import { UpdateGoalDto } from './dto/update-goal.dto';
 import { GoalService } from './goal.service';
 import { GoalExistInCounter } from './guards/goal-exist-in-counter.guard';
 
@@ -40,6 +42,15 @@ export class GoalController {
   @UseGuards(UserExistInTeam, CounterExistInTeam, GoalExistInCounter)
   getGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
     return this.goalService.getGoal(goalId);
+  }
+
+  @Patch('/:goalId')
+  @UseGuards(AdminGuard, CounterExistInTeam, GoalExistInCounter)
+  updateGoal(
+    @Param('goalId', ParseUUIDPipe) goalId: string,
+    @Body() updateGoalDto: UpdateGoalDto,
+  ) {
+    return this.goalService.updateGoal(goalId, updateGoalDto);
   }
 
   @Delete('/:goalId')
