@@ -49,6 +49,26 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
+  async cloneGoal(goalId: string) {
+    const goal = await this.getGoal(goalId);
+
+    if (!goal) throw new NotFoundException('Goal don`t found');
+
+    const { description, targetDays, achieved, achievedAt, counterId } = goal;
+
+    const clonedGoal = await this.goal.create({
+      data: {
+        description,
+        targetDays,
+        achieved,
+        achievedAt,
+        counterId,
+      },
+    });
+
+    return clonedGoal;
+  }
+
   async goalExistInCounter(goalId: string, counterId: string) {
     return this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
   }

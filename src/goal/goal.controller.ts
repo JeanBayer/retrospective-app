@@ -43,4 +43,12 @@ export class GoalController {
   getGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
     return this.goalService.getGoal(goalId);
   }
+
+  @Post('/:goalId/clone')
+  @UseGuards(UserExistInTeam)
+  @UseGuards(CounterExistInTeam)
+  @UseGuards(GoalExistInCounter)
+  cloneGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
+    return this.goalService.cloneGoal(goalId);
+  }
 }
