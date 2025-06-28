@@ -1,5 +1,3 @@
-Acciones de Usuario con la Entidad Team
-
 ## Auth
 
 [x] 1- register: Registrar una cuenta de usuario: Crear una cuenta personal con email, nombre y contraseña.
