@@ -18,6 +18,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinPasswordTeamDto, JoinTeamDto } from './dto/join-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { AdminGuard } from './guards/admin.guard';
+import { UserExistInTeam } from './guards/user-exist-in-team.guard';
 import { TeamService } from './team.service';
 
 @Controller('teams')
@@ -36,11 +37,9 @@ export class TeamController {
   }
 
   @Get('/:teamId')
-  getMyTeam(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
-    @User() user: CurrentUser,
-  ) {
-    return this.teamService.getMyTeam(user.id, teamId);
+  @UseGuards(UserExistInTeam)
+  getMyTeam(@Param('teamId', ParseUUIDPipe) teamId: string) {
+    return this.teamService.getMyTeam(teamId);
   }
 
   @Post('/:teamId')
@@ -70,6 +69,7 @@ export class TeamController {
   }
 
   @Delete('/:teamId')
+  @UseGuards(UserExistInTeam)
   leaveTeam(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @User() user: CurrentUser,
@@ -77,8 +77,9 @@ export class TeamController {
     return this.teamService.leaveTeam(user.id, teamId);
   }
 
-  @UseGuards(AdminGuard)
   @Post('/:teamId/users/:userId/admin')
+  @UseGuards(AdminGuard)
+  // TODO: crear un guard para el id del param y validarlo con el team
   promoteToAdmin(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('userId', ParseUUIDPipe) userId: string,
@@ -86,8 +87,9 @@ export class TeamController {
     return this.teamService.promoteToAdmin(userId, teamId);
   }
 
-  @UseGuards(AdminGuard)
   @Delete('/:teamId/users/:userId/admin')
+  @UseGuards(AdminGuard)
+  // TODO: crear un guard para el id del param y validarlo con el team
   demoteFromAdmin(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('teamId', ParseUUIDPipe) teamId: string,
@@ -96,15 +98,14 @@ export class TeamController {
   }
 
   @Get('/:teamId/users')
-  getUsers(
-    @Param('teamId', ParseUUIDPipe) teamId: string,
-    @User() user: CurrentUser,
-  ) {
-    return this.teamService.getUsers(user.id, teamId);
+  @UseGuards(UserExistInTeam)
+  getUsers(@Param('teamId', ParseUUIDPipe) teamId: string) {
+    return this.teamService.getUsers(teamId);
   }
 
-  @UseGuards(AdminGuard)
   @Delete('/:teamId/users/:userId')
+  @UseGuards(AdminGuard)
+  // TODO: crear un guard para el id del param y validarlo con el team
   leaveUserFromTeam(
     @Param('userId', ParseUUIDPipe) userId: string,
     @Param('teamId', ParseUUIDPipe) teamId: string,

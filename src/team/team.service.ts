@@ -95,9 +95,7 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     return teams;
   }
 
-  async getMyTeam(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
+  async getMyTeam(teamId: string) {
     return this.team.findFirst({
       where: {
         id: teamId,
@@ -112,8 +110,6 @@ export class TeamService extends PrismaClient implements OnModuleInit {
   }
 
   async leaveTeam(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
     try {
       await this.teamMembership.delete({
         where: {
@@ -202,9 +198,7 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  async getUsers(userId: string, teamId: string) {
-    await this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
-
+  async getUsers(teamId: string) {
     return await this.teamMembership.findMany({
       where: {
         teamId,
@@ -226,6 +220,10 @@ export class TeamService extends PrismaClient implements OnModuleInit {
 
   async userIsAdmin(userId: string, teamId: string) {
     return this.throwErrorIfUserDoesNotAdminInTeam(userId, teamId);
+  }
+
+  async userExistInTeam(userId: string, teamId: string) {
+    return this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
   }
 
   private async throwErrorIfUserDoesNotAdminInTeam(
