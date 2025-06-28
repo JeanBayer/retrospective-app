@@ -46,6 +46,7 @@ export class CounterController {
   }
 
   @Patch('/:counterId')
+  @UseGuards(AdminGuard)
   @UseGuards(UserExistInTeam)
   @UseGuards(CounterExistInTeam)
   updateCounter(
