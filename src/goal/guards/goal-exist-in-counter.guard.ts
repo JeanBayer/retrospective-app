@@ -32,7 +32,7 @@ export class GoalExistInCounter implements CanActivate {
     try {
       await this.goalService.goalExistInCounter(goalId, counterId);
     } catch {
-      throw new ForbiddenException("Counter doesn't exist in this team");
+      throw new ForbiddenException("Goal doesn't exist in this counter");
     }
     return true;
   }

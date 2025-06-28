@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -39,6 +40,12 @@ export class GoalController {
   @UseGuards(UserExistInTeam, CounterExistInTeam, GoalExistInCounter)
   getGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
     return this.goalService.getGoal(goalId);
+  }
+
+  @Delete('/:goalId')
+  @UseGuards(AdminGuard, CounterExistInTeam, GoalExistInCounter)
+  deleteGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
+    return this.goalService.deleteGoal(goalId);
   }
 
   @Post('/:goalId/clone')

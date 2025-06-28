@@ -49,6 +49,14 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
+  async deleteGoal(goalId: string) {
+    await this.goal.delete({
+      where: {
+        id: goalId,
+      },
+    });
+  }
+
   async cloneGoal(goalId: string) {
     const goal = await this.getGoal(goalId);
 
