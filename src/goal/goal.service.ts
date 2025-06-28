@@ -69,6 +69,20 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return clonedGoal;
   }
 
+  async reactivateGoal(goalId: string) {
+    const goal = await this.goal.update({
+      where: {
+        id: goalId,
+      },
+      data: {
+        achieved: false,
+        achievedAt: null,
+      },
+    });
+
+    return goal;
+  }
+
   async goalExistInCounter(goalId: string, counterId: string) {
     return this.throwErrorIfGoalDoesNotExistInCounter(goalId, counterId);
   }
