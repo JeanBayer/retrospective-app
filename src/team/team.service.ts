@@ -1,16 +1,13 @@
 import {
-  ConflictException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
-import { compareSync, hashSync } from 'bcrypt';
+import { hashSync } from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { JoinTeamDto } from './dto/join-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 
 @Injectable()
@@ -52,29 +49,6 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     }
   }
 
-  async joinTeam(joinTeamDto: JoinTeamDto) {
-    const { userId, teamId, joinPassword } = joinTeamDto;
-
-    await this.throwErrorIfUserExistInTeam(userId, teamId);
-
-    const { joinPassword: _, ...team } =
-      await this.throwErrorIfPasswordDoesNotExistInTeam(teamId, joinPassword);
-
-    try {
-      await this.teamMembership.create({
-        data: {
-          teamId,
-          userId,
-        },
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) throw new ConflictException(error.message);
-      throw new ConflictException('Error while trying to join the team.');
-    }
-
-    return team;
-  }
-
   async getMyTeams(userId: string) {
     const teams = await this.team.findMany({
       where: {
@@ -107,22 +81,6 @@ export class TeamService extends PrismaClient implements OnModuleInit {
         updatedAt: true,
       },
     });
-  }
-
-  async leaveTeam(userId: string, teamId: string) {
-    try {
-      await this.teamMembership.delete({
-        where: {
-          userId_teamId: {
-            teamId,
-            userId,
-          },
-        },
-      });
-    } catch (error) {
-      this.logger.error(error);
-      throw new ConflictException('Error while trying to leave the team.');
-    }
   }
 
   async updateTeam(teamId: string, updateTeam: UpdateTeamDto) {
@@ -172,37 +130,5 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     if (!userIsAdminInTeam) throw new ForbiddenException('User is not admin');
 
     return userIsAdminInTeam;
-  }
-
-  private async throwErrorIfUserExistInTeam(userId: string, teamId: string) {
-    const userAlreadyInTeam = await this.teamMembership.findFirst({
-      where: {
-        userId,
-        teamId,
-      },
-    });
-
-    if (userAlreadyInTeam)
-      throw new ConflictException('User is already a member of this team');
-
-    return null;
-  }
-
-  private async throwErrorIfPasswordDoesNotExistInTeam(
-    teamId: string,
-    password: string,
-  ) {
-    const team = await this.team.findUnique({
-      where: {
-        id: teamId,
-      },
-    });
-
-    if (!team) throw new NotFoundException('Team dont found');
-
-    const isPasswordEqual = compareSync(password, team.joinPassword);
-    if (!isPasswordEqual) throw new ConflictException('Invalid password team');
-
-    return team;
   }
 }
