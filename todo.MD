@@ -38,7 +38,7 @@
 [x] 3- getGoal: buscar la meta de un counter. [REF] [GOAL_EXIST_IN_COUNTER]
 [] 4- editar meta de un counter. [REF] [ADMIN] [GOAL_EXIST_IN_COUNTER]
 [] 5- eliminar meta de un counter. [REF] [ADMIN] [GOAL_EXIST_IN_COUNTER]
-[] 6- reactivar meta de un counter. [REF] [ADMIN] [GOAL_EXIST_IN_COUNTER]
+[x] 6- reactivar meta de un counter. [REF] [ADMIN] [GOAL_EXIST_IN_COUNTER]
 [x] 7- clonar meta de un counter. [REF] [GOAL_EXIST_IN_COUNTER]
 
 ## Retrospective
