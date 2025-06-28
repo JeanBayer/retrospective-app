@@ -33,7 +33,7 @@ Acciones de Usuario con la Entidad Team
 [x] [] 6A- al incrementar un counter se revisa si cumplió una meta (archived: false) y si es el caso se marca como cumplida
 [x] 7- resetCounter: reset counter de un equipo. [REF] [COUNTER_EXIST_TEAM]
 
-## GOAL [AUTH] [USER_EXIST_TEAM] [COUNTER_EXIST_TEAM]
+## Goal [AUTH] [USER_EXIST_TEAM] [COUNTER_EXIST_TEAM]
 
 [x] 1- createGoal: crear meta a un counter. [REF]
 [x] 2- getGoals: listar metas de un counter. [REF]
@@ -41,3 +41,6 @@ Acciones de Usuario con la Entidad Team
 [] 4- editar meta de un equipo. [REF] [ADMIN] [GOAL_EXIST_IN_TEAM]
 [] 5- eliminar meta de un equipo. [REF] [ADMIN] [GOAL_EXIST_IN_TEAM]
 [] 6- reactivar meta de un equipo. [REF] [ADMIN] [GOAL_EXIST_IN_TEAM]
+
+## Retrospective
+[] 1- Crear una retrospectiva
