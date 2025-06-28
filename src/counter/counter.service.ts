@@ -82,7 +82,22 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
     });
 
-    return counters;
+    const countWithModifiedStatusPromise = counters?.map(async (counter) => {
+      const alreadyModifiedToday = await this.hasCounterBeenModifiedToday(
+        counter.id,
+      );
+
+      return {
+        ...counter,
+        alreadyModifiedToday,
+      };
+    });
+
+    const countWithModifiedStatus = await Promise.all(
+      countWithModifiedStatusPromise,
+    );
+
+    return countWithModifiedStatus;
   }
 
   async getCounter(userId: string, teamId: string, counterId: string) {

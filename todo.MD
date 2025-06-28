@@ -12,11 +12,11 @@ Acciones de Usuario con la Entidad Team
 [x] 3- Ver mis equipos: Consultar la lista de todos los equipos a los que pertenece mi cuenta de usuario.
 [x] 4- Salirme de un equipo: Abandonar un equipo al que pertenezco, dejando de ser miembro.
 [x] 5- Consultar un equipo
-[x] 6- Cambiar la contraseña de un equipo: Actualizar la contraseña de unión de un equipo existente.
-[x] 7- Cambiar el nombre de un equipo: Modificar el nombre del equipo al que pertenezco.
-[x] 8- Hacer administrador a un miembro
-[x] 9- Quitar a un administrador
-[x] 10- Quitar a un miembro: Eliminar a un miembro del equipo, ya sea administrador o no.
+[x] 6- Cambiar la contraseña de un equipo: Actualizar la contraseña de unión de un equipo existente. [ADMIN]
+[x] 7- Cambiar el nombre de un equipo: Modificar el nombre del equipo al que pertenezco. [ADMIN]
+[x] 8- Hacer administrador a un miembro [ADMIN]
+[x] 9- Quitar a un administrador [ADMIN]
+[x] 10- Quitar a un miembro: Eliminar a un miembro del equipo, ya sea administrador o no. [ADMIN]
 
 ## Counter
 
