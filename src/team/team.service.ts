@@ -130,19 +130,14 @@ export class TeamService extends PrismaClient implements OnModuleInit {
   }
 
   async updateTeam(teamId: string, updateTeam: UpdateTeamDto) {
-    let dataToUpdate: UpdateTeamDto = {};
+    let dataToUpdate: UpdateTeamDto = {
+      ...updateTeam,
+    };
 
     if (updateTeam?.joinPassword) {
       dataToUpdate = {
         ...dataToUpdate,
         joinPassword: hashSync(updateTeam.joinPassword, 10),
-      };
-    }
-
-    if (updateTeam?.name) {
-      dataToUpdate = {
-        ...dataToUpdate,
-        name: updateTeam.name,
       };
     }
 
