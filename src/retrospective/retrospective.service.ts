@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
+import { UpdateRetrospectiveDto } from './dto/update-retrospective.dto';
 
 @Injectable()
 export class RetrospectiveService extends PrismaClient implements OnModuleInit {
@@ -36,6 +37,22 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     });
 
     return retrospectives;
+  }
+
+  async updateRetrospective(
+    retroId: string,
+    createRetrospectiveDto: UpdateRetrospectiveDto,
+  ) {
+    const retrospective = await this.retrospective.update({
+      where: {
+        id: retroId,
+      },
+      data: {
+        ...createRetrospectiveDto,
+      },
+    });
+
+    return retrospective;
   }
 
   async getRetrospective(retroId: string) {

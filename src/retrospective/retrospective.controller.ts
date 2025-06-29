@@ -4,12 +4,14 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
+import { UpdateRetrospectiveDto } from './dto/update-retrospective.dto';
 import { RetrospectiveExistInTeamGuard } from './guards/counter-exist-in-team.guard';
 import { RetrospectiveService } from './retrospective.service';
 
@@ -40,5 +42,17 @@ export class RetrospectiveController {
   @UseGuards(UserExistInTeam, RetrospectiveExistInTeamGuard)
   getRetrospective(@Param('retroId', ParseUUIDPipe) retroId: string) {
     return this.retrospectiveService.getRetrospective(retroId);
+  }
+
+  @Patch('/:retroId')
+  @UseGuards(UserExistInTeam, RetrospectiveExistInTeamGuard)
+  updateRetrospective(
+    @Param('retroId', ParseUUIDPipe) retroId: string,
+    @Body() updateRetrospectiveDto: UpdateRetrospectiveDto,
+  ) {
+    return this.retrospectiveService.updateRetrospective(
+      retroId,
+      updateRetrospectiveDto,
+    );
   }
 }
