@@ -12,7 +12,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
 import { UpdateRetrospectiveDto } from './dto/update-retrospective.dto';
-import { RetrospectiveExistInTeamGuard } from './guards/counter-exist-in-team.guard';
+import { RetrospectiveExistInTeamGuard } from './guards/retrospective-exist-in-team.guard';
 import { RetrospectiveService } from './retrospective.service';
 
 @Controller('teams/:teamId/retrospectives')
