@@ -10,6 +10,7 @@ import {
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
+import { RetrospectiveExistInTeamGuard } from './guards/counter-exist-in-team.guard';
 import { RetrospectiveService } from './retrospective.service';
 
 @Controller('teams/:teamId/retrospectives')
@@ -33,5 +34,11 @@ export class RetrospectiveController {
   @UseGuards(UserExistInTeam)
   getRetrospectives(@Param('teamId', ParseUUIDPipe) teamId: string) {
     return this.retrospectiveService.getRetrospectives(teamId);
+  }
+
+  @Get('/:retroId')
+  @UseGuards(UserExistInTeam, RetrospectiveExistInTeamGuard)
+  getRetrospective(@Param('retroId', ParseUUIDPipe) retroId: string) {
+    return this.retrospectiveService.getRetrospective(retroId);
   }
 }

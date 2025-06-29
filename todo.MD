@@ -45,3 +45,4 @@
 
 [x] 1- Crear una retrospectiva a un equipo. [REF]
 [x] 2- Consultar las retrospectivas de un equipo. [REF]
+[x] 3- Consultar la retrospectiva de un equipo. [REF] [RETRO_EXIST_IN_TEAM]

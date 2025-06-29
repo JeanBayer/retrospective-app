@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
 
@@ -31,5 +36,37 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     });
 
     return retrospectives;
+  }
+
+  async getRetrospective(retroId: string) {
+    const retrospective = await this.retrospective.findFirst({
+      where: {
+        id: retroId,
+      },
+    });
+
+    return retrospective;
+  }
+
+  async retrospectiveExistInTeam(teamId: string, retroId: string) {
+    return await this.throwErrorIfRetrospectiveDoesNotExistInTeam(
+      teamId,
+      retroId,
+    );
+  }
+
+  private async throwErrorIfRetrospectiveDoesNotExistInTeam(
+    teamId: string,
+    retroId: string,
+  ) {
+    const retrospective = await this.retrospective.count({
+      where: {
+        id: retroId,
+        teamId,
+      },
+    });
+
+    if (!retrospective)
+      throw new NotFoundException('Retrospective don`t found');
   }
 }
