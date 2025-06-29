@@ -72,6 +72,10 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     );
   }
 
+  async retrospectiveOpenRequired(retroId: string) {
+    return await this.throwErrorIfRetrospectiveDoesNotOpenState(retroId);
+  }
+
   private async throwErrorIfRetrospectiveDoesNotExistInTeam(
     teamId: string,
     retroId: string,
@@ -85,5 +89,17 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
 
     if (!retrospective)
       throw new NotFoundException('Retrospective don`t found');
+  }
+
+  private async throwErrorIfRetrospectiveDoesNotOpenState(retroId: string) {
+    const retrospective = await this.retrospective.count({
+      where: {
+        id: retroId,
+        status: 'CREATED',
+      },
+    });
+
+    if (!retrospective)
+      throw new NotFoundException('Retrospective with open status don`t found');
   }
 }

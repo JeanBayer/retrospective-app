@@ -7,22 +7,12 @@ import {
 import { RetrospectiveService } from '../retrospective.service';
 
 @Injectable()
-export class RetrospectiveExistInTeamGuard implements CanActivate {
+export class RetrospectiveOpenRequiredGuard implements CanActivate {
   constructor(private readonly retrospectiveService: RetrospectiveService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const request = context.switchToHttp().getRequest();
-
-    const { teamId } = request.params;
-    if (!teamId) {
-      throw new ForbiddenException('Team ID is required');
-    }
-    const { user } = request;
-
-    if (!user || !user?.id) {
-      throw new ForbiddenException('User is not authenticated');
-    }
 
     const { retroId } = request.params;
     if (!retroId) {
@@ -30,9 +20,11 @@ export class RetrospectiveExistInTeamGuard implements CanActivate {
     }
 
     try {
-      await this.retrospectiveService.retrospectiveExistInTeam(teamId, retroId);
+      await this.retrospectiveService.retrospectiveOpenRequired(retroId);
     } catch {
-      throw new ForbiddenException("Retrospective doesn't exist in this team");
+      throw new ForbiddenException(
+        'The retrospective must be open to perform this action.',
+      );
     }
     return true;
   }
