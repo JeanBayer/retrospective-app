@@ -14,6 +14,7 @@ import { AdminGuard } from 'src/team/guards/admin.guard';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
 import { UpdateRetrospectiveDto } from './dto/update-retrospective.dto';
 import { RetrospectiveExistInTeamGuard } from './guards/retrospective-exist-in-team.guard';
+import { RetrospectiveOpenRequiredGuard } from './guards/retrospective-open-required.guard';
 import { RetrospectiveService } from './retrospective.service';
 
 @Controller('teams/:teamId/retrospectives')
@@ -55,5 +56,15 @@ export class RetrospectiveController {
       retroId,
       updateRetrospectiveDto,
     );
+  }
+
+  @Post('/:retroId/close')
+  @UseGuards(
+    AdminGuard,
+    RetrospectiveExistInTeamGuard,
+    RetrospectiveOpenRequiredGuard,
+  )
+  closeRetrospective(@Param('retroId', ParseUUIDPipe) retroId: string) {
+    return this.retrospectiveService.closeRetrospective(retroId);
   }
 }

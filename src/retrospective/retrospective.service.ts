@@ -55,6 +55,46 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     return retrospective;
   }
 
+  async closeRetrospective(retroId: string) {
+    const sprintWinnerId = await this.calculateSprintWinner(retroId);
+    const retrospective = await this.retrospective.update({
+      where: {
+        id: retroId,
+      },
+      data: {
+        status: 'CLOSED',
+        sprintWinnerId,
+      },
+      select: {
+        id: true,
+        retrospectiveName: true,
+        retrospectiveNumber: true,
+        status: true,
+        teamId: true,
+        createdAt: true,
+        sprintWinner: {
+          select: {
+            id: true,
+            name: true,
+            sprintWins: true,
+          },
+        },
+      },
+    });
+    await this.user.update({
+      where: {
+        id: sprintWinnerId,
+      },
+      data: {
+        sprintWins: {
+          increment: 1,
+        },
+      },
+    });
+
+    return retrospective;
+  }
+
   async getRetrospective(retroId: string) {
     const retrospective = await this.retrospective.findFirst({
       where: {
@@ -74,6 +114,50 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
 
   async retrospectiveOpenRequired(retroId: string) {
     return await this.throwErrorIfRetrospectiveDoesNotOpenState(retroId);
+  }
+
+  private async calculateSprintWinner(retroId: string) {
+    const winners = await this.selectSprintWinner(retroId);
+
+    // If there are multiple winners, we should select one randomly
+    let selectedWinner = winners[0].votedForId;
+
+    if (winners.length > 1) {
+      const randomIndex = Math.floor(Math.random() * winners.length);
+      selectedWinner = winners[randomIndex].votedForId;
+    }
+
+    return selectedWinner;
+  }
+
+  private async selectSprintWinner(retroId: string) {
+    const votes = await this.vote.groupBy({
+      where: {
+        retrospectiveId: retroId,
+      },
+      by: ['votedForId'],
+      _count: {
+        votedForId: true,
+      },
+      orderBy: {
+        _count: {
+          votedForId: 'desc',
+        },
+      },
+    });
+
+    if (votes.length === 0) {
+      throw new NotFoundException('No votes found for this retrospective');
+    }
+
+    const maxVotes = votes[0]._count.votedForId;
+
+    return votes
+      .filter((vote) => vote._count.votedForId === maxVotes)
+      .map((vote) => ({
+        votedForId: vote.votedForId,
+        count: vote._count.votedForId,
+      }));
   }
 
   private async throwErrorIfRetrospectiveDoesNotExistInTeam(

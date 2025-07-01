@@ -48,7 +48,7 @@
 [x] 2- Consultar las retrospectivas de un equipo. [REF]
 [x] 3- Consultar la retrospectiva de un equipo. [REF] [RETRO_EXIST_IN_TEAM]
 [x] 4- Editar la retrospectiva de un equipo, [REF] [ADMIN] [RETRO_EXIST_IN_TEAM]
-[] 5- Cerrar la retrospectiva de un equipo. [REF] [ADMIN] [RETRO_EXIST_IN_TEAM]
+[Y] 5- Cerrar la retrospectiva de un equipo. [REF] [ADMIN] [RETRO_EXIST_IN_TEAM]
 
 ## Thank yous [AUTH] [USER_EXIST_IN_TEAM]
 
