@@ -43,7 +43,7 @@ export class SprintWinnerController {
 
   @Get('')
   @UseGuards(UserExistInTeam, RetrospectiveExistInTeamGuard)
-  getWinner() {
-    return this.sprintWinnerService.getWinner();
+  getWinner(@Param('retroId', ParseUUIDPipe) retrospectiveId: string) {
+    return this.sprintWinnerService.getWinner(retrospectiveId);
   }
 }

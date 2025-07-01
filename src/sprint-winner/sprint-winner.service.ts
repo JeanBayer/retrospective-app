@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
@@ -31,7 +32,26 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
     });
   }
 
-  getWinner() {}
+  async getWinner(retrospectiveId: string) {
+    const retrospective = await this.retrospective.findFirst({
+      where: {
+        id: retrospectiveId,
+      },
+      select: {
+        sprintWinner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    if (!retrospective?.sprintWinner)
+      throw new NotFoundException('Sprint winner dont found');
+
+    return retrospective?.sprintWinner;
+  }
 
   private async throwErrorIfUserAlreadyVotedInRetrospective(
     userId: string,
