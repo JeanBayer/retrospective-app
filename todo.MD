@@ -57,7 +57,7 @@
 
 ## Sprint winner [AUTH] [USER_EXIST_IN_TEAM]
 
-[] 1- Votar por el elegido de un sprint de una retrospectiva. [RETRO_EXIST_IN_TEAM] [RETRO_IS_OPEN][OTHER_USER_EXIST_IN_TEAM]
+[x] 1- Votar por el elegido de un sprint de una retrospectiva. [RETRO_EXIST_IN_TEAM] [RETRO_IS_OPEN][OTHER_USER_EXIST_IN_TEAM]
 [] 2- Mostrar el elegido de un sprint de una retrospectiva. [RETRO_EXIST_IN_TEAM] 
 
 ## User [AUTH]

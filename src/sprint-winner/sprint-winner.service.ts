@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 
 @Injectable()
@@ -8,7 +13,40 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
     await this.$connect();
   }
 
-  voteWinner() {}
+  async voteWinner(
+    userId: string,
+    retrospectiveId: string,
+    votedForId: string,
+  ) {
+    await this.throwErrorIfUserAlreadyVotedInRetrospective(
+      userId,
+      retrospectiveId,
+    );
+    await this.vote.create({
+      data: {
+        voterId: userId,
+        retrospectiveId,
+        votedForId,
+      },
+    });
+  }
 
   getWinner() {}
+
+  private async throwErrorIfUserAlreadyVotedInRetrospective(
+    userId: string,
+    retrospectiveId: string,
+  ) {
+    const userAlreadyInVotedInRetrospective = await this.vote.findFirst({
+      where: {
+        retrospectiveId,
+        voterId: userId,
+      },
+    });
+
+    if (userAlreadyInVotedInRetrospective)
+      throw new ConflictException(
+        'User has already voted in this retrospective',
+      );
+  }
 }

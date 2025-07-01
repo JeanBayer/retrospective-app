@@ -1,5 +1,16 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { User } from 'src/common/decorators/user.decorator';
+import { CurrentUser } from 'src/common/interfaces/current-user.interface';
+import { UserBodyExistInTeam } from 'src/membership/guards/user-body-exist-in-team.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
 import { RetrospectiveExistInTeamGuard } from 'src/retrospective/guards/retrospective-exist-in-team.guard';
 import { RetrospectiveOpenRequiredGuard } from 'src/retrospective/guards/retrospective-open-required.guard';
@@ -13,11 +24,21 @@ export class SprintWinnerController {
   @Post('')
   @UseGuards(
     UserExistInTeam,
+    UserBodyExistInTeam,
     RetrospectiveExistInTeamGuard,
     RetrospectiveOpenRequiredGuard,
   )
-  voteWinner() {
-    return this.sprintWinnerService.voteWinner();
+  voteWinner(
+    @Param('retroId', ParseUUIDPipe) retrospectiveId: string,
+    @Body('userId', ParseUUIDPipe) votedForId: string,
+    @User()
+    user: CurrentUser,
+  ) {
+    return this.sprintWinnerService.voteWinner(
+      user.id,
+      retrospectiveId,
+      votedForId,
+    );
   }
 
   @Get('')
