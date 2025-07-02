@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -19,14 +20,24 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     teamId: string,
     createRetrospectiveDto: CreateRetrospectiveDto,
   ) {
-    const retrospective = await this.retrospective.create({
-      data: {
-        ...createRetrospectiveDto,
-        teamId,
-      },
-    });
+    const lastRetroNumber = await this.getLastRetrospectiveNumber(teamId);
 
-    return retrospective;
+    try {
+      const retrospective = await this.retrospective.create({
+        data: {
+          ...createRetrospectiveDto,
+          retrospectiveNumber: lastRetroNumber + 1,
+          teamId,
+        },
+      });
+
+      return retrospective;
+    } catch (error) {
+      this.logger.error(error);
+      throw new ConflictException(
+        'Error while trying to create the retrospective. Please try again later.',
+      );
+    }
   }
 
   async getRetrospectives(teamId: string) {
@@ -114,6 +125,15 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
 
   async retrospectiveOpenRequired(retroId: string) {
     return await this.throwErrorIfRetrospectiveDoesNotOpenState(retroId);
+  }
+
+  async getLastRetrospectiveNumber(teamId: string) {
+    const latest = await this.retrospective.findFirst({
+      where: { teamId },
+      orderBy: { retrospectiveNumber: 'desc' },
+    });
+
+    return latest?.retrospectiveNumber || 1;
   }
 
   private async calculateSprintWinner(retroId: string) {
