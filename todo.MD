@@ -10,7 +10,7 @@
 [x] 2- createTeam: Crear un nuevo equipo: Después de iniciar sesión, crear un nuevo equipo con un nombre y una contraseña para unirse, y automáticamente ser su administrador. [REF]
 [x] 3- getMyTeam: Consultar un equipo al que pertenezco. [REF] [USER_EXIST_IN_TEAM]
 [x] 4- updateTeam: Editar un equipo al que pertenezco. [REF] [ADMIN]
-[] 5- Listar el ranking de los mas elegidos del sprint en el equipo. [REF] [USER_EXIST_IN_TEAM]
+[x] 5- Listar el ranking de los mas elegidos del sprint en el equipo. [REF] [USER_EXIST_IN_TEAM]
 
 ## Membership [AUTH] [USER_EXIST_IN_TEAM]
 

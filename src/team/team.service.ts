@@ -6,7 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { hashSync } from 'bcrypt';
-import { PrismaClient } from 'generated/prisma';
+import { Prisma, PrismaClient } from 'generated/prisma';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 
@@ -111,6 +111,73 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  async getRanking(teamId: string) {
+    const rankingCount = await this.getRawRankingByTeam(teamId);
+    const members = await this.getUsersByTeam(teamId);
+
+    const membersWithRanking = this.getUsersByRankingTeam(
+      rankingCount,
+      members,
+    );
+
+    return membersWithRanking;
+  }
+
+  private getUsersByRankingTeam(rankingCount: RankingCount, members: Members) {
+    const countRankingByUserId = (userId: string) => {
+      return (
+        rankingCount?.find(({ sprintWinnerId }) => sprintWinnerId === userId)
+          ?._count.sprintWinnerId || 0
+      );
+    };
+
+    const membersWithRanking = members
+      ?.map(({ user }) => ({
+        id: user.id,
+        name: user.name,
+        totalSprintWinner: user.sprintWins,
+        teamSprintWinner: countRankingByUserId(user.id),
+      }))
+      .toSorted((a, b) => b.teamSprintWinner - a.teamSprintWinner);
+
+    return membersWithRanking;
+  }
+
+  private async getRawRankingByTeam(teamId: string) {
+    return await this.retrospective.groupBy({
+      where: {
+        teamId,
+        status: 'CLOSED',
+      },
+      by: ['sprintWinnerId'],
+      _count: {
+        sprintWinnerId: true,
+      },
+      orderBy: {
+        _count: {
+          sprintWinnerId: 'desc',
+        },
+      },
+    });
+  }
+
+  private async getUsersByTeam(teamId: string) {
+    return await this.teamMembership.findMany({
+      where: {
+        teamId,
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            sprintWins: true,
+          },
+        },
+      },
+    });
+  }
+
   async userIsAdmin(userId: string, teamId: string) {
     return this.throwErrorIfUserDoesNotAdminInTeam(userId, teamId);
   }
@@ -132,3 +199,20 @@ export class TeamService extends PrismaClient implements OnModuleInit {
     return userIsAdminInTeam;
   }
 }
+
+type RankingCount = (Prisma.PickEnumerable<
+  Prisma.RetrospectiveGroupByOutputType,
+  'sprintWinnerId'[]
+> & {
+  _count: {
+    sprintWinnerId: number;
+  };
+})[];
+
+type Members = {
+  user: {
+    id: string;
+    name: string;
+    sprintWins: number;
+  };
+}[];

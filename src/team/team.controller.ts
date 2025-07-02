@@ -46,4 +46,10 @@ export class TeamController {
   ) {
     return this.teamService.updateTeam(teamId, updateTeamDto);
   }
+
+  @Get('/:teamId/ranking')
+  @UseGuards(UserExistInTeam)
+  getRanking(@Param('teamId', ParseUUIDPipe) teamId: string) {
+    return this.teamService.getRanking(teamId);
+  }
 }
