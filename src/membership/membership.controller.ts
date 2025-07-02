@@ -29,6 +29,15 @@ export class MembershipController {
     return this.membershipService.getUsers(teamId);
   }
 
+  @Get('/my-membership')
+  @UseGuards(UserExistInTeam)
+  getMyMembership(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @User() user: CurrentUser,
+  ) {
+    return this.membershipService.getMyMembership(teamId, user.id);
+  }
+
   @Post('')
   joinTeam(
     @Param('teamId', ParseUUIDPipe) teamId: string,

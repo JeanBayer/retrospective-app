@@ -120,6 +120,27 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
     });
   }
 
+  async getMyMembership(teamId: string, userId: string) {
+    return await this.teamMembership.findFirst({
+      where: {
+        teamId,
+        userId,
+      },
+      select: {
+        userId: true,
+        teamId: true,
+        isAdmin: true,
+        joinedAt: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
   async userExistInTeam(userId: string, teamId: string) {
     return this.throwErrorIfUserDoesNotExistInTeam(userId, teamId);
   }
