@@ -6,9 +6,10 @@ import { GoalModule } from './goal/goal.module';
 import { MembershipModule } from './membership/membership.module';
 import { RetrospectiveModule } from './retrospective/retrospective.module';
 import { SprintWinnerModule } from './sprint-winner/sprint-winner.module';
+import { ThankYouModule } from './thank-you/thank-you.module';
 
 @Module({
-  imports: [AuthModule, TeamModule, CounterModule, GoalModule, MembershipModule, RetrospectiveModule, SprintWinnerModule],
+  imports: [AuthModule, TeamModule, CounterModule, GoalModule, MembershipModule, RetrospectiveModule, SprintWinnerModule, ThankYouModule],
   controllers: [],
   providers: [],
 })
