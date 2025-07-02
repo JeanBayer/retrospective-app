@@ -68,40 +68,43 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
 
   async closeRetrospective(retroId: string) {
     const sprintWinnerId = await this.calculateSprintWinner(retroId);
-    const retrospective = await this.retrospective.update({
-      where: {
-        id: retroId,
-      },
-      data: {
-        status: 'CLOSED',
-        sprintWinnerId,
-      },
-      select: {
-        id: true,
-        retrospectiveName: true,
-        retrospectiveNumber: true,
-        status: true,
-        teamId: true,
-        createdAt: true,
-        sprintWinner: {
-          select: {
-            id: true,
-            name: true,
-            sprintWins: true,
+
+    const [retrospective] = await this.$transaction([
+      this.retrospective.update({
+        where: {
+          id: retroId,
+        },
+        data: {
+          status: 'CLOSED',
+          sprintWinnerId,
+        },
+        select: {
+          id: true,
+          retrospectiveName: true,
+          retrospectiveNumber: true,
+          status: true,
+          teamId: true,
+          createdAt: true,
+          sprintWinner: {
+            select: {
+              id: true,
+              name: true,
+              sprintWins: true,
+            },
           },
         },
-      },
-    });
-    await this.user.update({
-      where: {
-        id: sprintWinnerId,
-      },
-      data: {
-        sprintWins: {
-          increment: 1,
+      }),
+      this.user.update({
+        where: {
+          id: sprintWinnerId,
         },
-      },
-    });
+        data: {
+          sprintWins: {
+            increment: 1,
+          },
+        },
+      }),
+    ]);
 
     return retrospective;
   }
