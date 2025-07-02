@@ -64,6 +64,6 @@
 
 ## User [AUTH]
 
-[] 1- Listar los agradecimientos que he dado y recibido. [REF]
+[x] 1- Listar los agradecimientos que he dado y recibido. [REF]
 [] 2- Obtener la información de mi usuario. []
 [] 3- Editar mi usuario. []

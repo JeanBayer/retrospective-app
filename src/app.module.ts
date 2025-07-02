@@ -7,9 +7,10 @@ import { MembershipModule } from './membership/membership.module';
 import { RetrospectiveModule } from './retrospective/retrospective.module';
 import { SprintWinnerModule } from './sprint-winner/sprint-winner.module';
 import { ThankYouModule } from './thank-you/thank-you.module';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [AuthModule, TeamModule, CounterModule, GoalModule, MembershipModule, RetrospectiveModule, SprintWinnerModule, ThankYouModule],
+  imports: [AuthModule, TeamModule, CounterModule, GoalModule, MembershipModule, RetrospectiveModule, SprintWinnerModule, ThankYouModule, UserModule],
   controllers: [],
   providers: [],
 })
