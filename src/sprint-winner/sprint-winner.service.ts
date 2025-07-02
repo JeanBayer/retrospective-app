@@ -53,6 +53,26 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
     return retrospective?.sprintWinner;
   }
 
+  async getVoteStatus(userId: string, retrospectiveId: string) {
+    const myVote = await this.vote.findFirst({
+      where: {
+        retrospectiveId,
+        voterId: userId,
+      },
+    });
+
+    const totalVotes = await this.vote.count({
+      where: {
+        retrospectiveId,
+      },
+    });
+
+    return {
+      ...myVote,
+      totalVotes,
+    };
+  }
+
   private async throwErrorIfUserAlreadyVotedInRetrospective(
     userId: string,
     retrospectiveId: string,

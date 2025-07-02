@@ -46,4 +46,18 @@ export class SprintWinnerController {
   getWinner(@Param('retroId', ParseUUIDPipe) retrospectiveId: string) {
     return this.sprintWinnerService.getWinner(retrospectiveId);
   }
+
+  @Get('vote-status')
+  @UseGuards(
+    UserExistInTeam,
+    RetrospectiveExistInTeamGuard,
+    RetrospectiveOpenRequiredGuard,
+  )
+  getVoteStatus(
+    @Param('retroId', ParseUUIDPipe) retrospectiveId: string,
+    @User()
+    user: CurrentUser,
+  ) {
+    return this.sprintWinnerService.getVoteStatus(user.id, retrospectiveId);
+  }
 }

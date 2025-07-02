@@ -55,10 +55,11 @@
 [] 1- Crear un agradecimiento de una retrospectiva. [REF] [RETRO_EXIST_IN_TEAM] [RETRO_IS_OPEN]
 [] 2- Listar los agradecimientos de una retrospectiva. [REF] [RETRO_EXIST_IN_TEAM]
 
-## Sprint winner [AUTH] [USER_EXIST_IN_TEAM]
+## Sprint winner [AUTH] [USER_EXIST_IN_TEAM] [RETRO_EXIST_IN_TEAM]
 
-[x] 1- Votar por el elegido de un sprint de una retrospectiva. [RETRO_EXIST_IN_TEAM] [RETRO_IS_OPEN][OTHER_USER_EXIST_IN_TEAM]
-[] 2- Mostrar el elegido de un sprint de una retrospectiva. [RETRO_EXIST_IN_TEAM] 
+[x] 1- Votar por el elegido de un sprint de una retrospectiva. [REF] [RETRO_IS_OPEN] [OTHER_USER_EXIST_IN_TEAM]
+[] 2- Mostrar el elegido de un sprint de una retrospectiva. [REF]
+[x] 3- Mostrar estatus del voto y total votos de una retrospectiva [REF] [RETRO_IS_OPEN]
 
 ## User [AUTH]
 
