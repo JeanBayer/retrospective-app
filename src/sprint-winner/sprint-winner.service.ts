@@ -42,6 +42,7 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
           select: {
             id: true,
             name: true,
+            sprintWins: true,
           },
         },
       },
