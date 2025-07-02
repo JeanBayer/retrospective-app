@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { CreateThankYouDto } from './dto/create-thank-you.dto';
 
@@ -70,5 +75,27 @@ export class ThankYouService extends PrismaClient implements OnModuleInit {
         createdAt: true,
       },
     });
+  }
+
+  async deleteThankYou(thankYouId: string) {
+    await this.thankYou.delete({
+      where: {
+        id: thankYouId,
+      },
+    });
+  }
+
+  async throwErrorIfThankYouDoesNotExistInRetro(
+    thanYouId: string,
+    retrospectiveId: string,
+  ) {
+    const thankYou = await this.thankYou.count({
+      where: {
+        id: thanYouId,
+        retrospectiveId,
+      },
+    });
+
+    if (!thankYou) throw new NotFoundException('ThankYou don`t found');
   }
 }

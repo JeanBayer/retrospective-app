@@ -53,7 +53,7 @@
 ## Thank yous [AUTH] [USER_EXIST_IN_TEAM] [RETRO_EXIST_IN_TEAM]
 
 [x] 1- Crear un agradecimiento de una retrospectiva. [REF] [RETRO_IS_OPEN]
-[] 2- Eliminar un agradecimiento de una retrospectiva. [REF] [RETRO_IS_OPEN] []
+[x] 2- Eliminar un agradecimiento de una retrospectiva. [REF] [ADMIN] [RETRO_IS_OPEN]
 [x] 3- Listar los agradecimientos de una retrospectiva. [REF]
 
 ## Sprint winner [AUTH] [USER_EXIST_IN_TEAM] [RETRO_EXIST_IN_TEAM]
