@@ -54,7 +54,7 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
     return retrospective?.sprintWinner;
   }
 
-  async getVoteStatus(userId: string, retrospectiveId: string) {
+  async getVoteStatus(userId: string, retrospectiveId: string, teamId: string) {
     const myVote = await this.vote.findFirst({
       where: {
         retrospectiveId,
@@ -68,9 +68,26 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    const totalMembers = await this.teamMembership.count({
+      where: {
+        teamId,
+      },
+    });
+
+    const retrospectiveStatusResult = await this.retrospective.findFirst({
+      where: {
+        id: retrospectiveId,
+      },
+      select: {
+        status: true,
+      },
+    });
+
     return {
-      ...myVote,
+      myVote,
       totalVotes,
+      totalMembers,
+      statusRetrospective: retrospectiveStatusResult?.status || 'CLOSED',
     };
   }
 

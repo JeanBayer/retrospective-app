@@ -48,16 +48,17 @@ export class SprintWinnerController {
   }
 
   @Get('vote-status')
-  @UseGuards(
-    UserExistInTeam,
-    RetrospectiveExistInTeamGuard,
-    RetrospectiveOpenRequiredGuard,
-  )
+  @UseGuards(UserExistInTeam, RetrospectiveExistInTeamGuard)
   getVoteStatus(
     @Param('retroId', ParseUUIDPipe) retrospectiveId: string,
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @User()
     user: CurrentUser,
   ) {
-    return this.sprintWinnerService.getVoteStatus(user.id, retrospectiveId);
+    return this.sprintWinnerService.getVoteStatus(
+      user.id,
+      retrospectiveId,
+      teamId,
+    );
   }
 }
