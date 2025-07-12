@@ -80,14 +80,14 @@ export class GoalService extends PrismaClient implements OnModuleInit {
 
     if (!goal) throw new NotFoundException('Goal don`t found');
 
-    const { description, targetDays, achieved, achievedAt, counterId } = goal;
+    const { description, targetDays, counterId } = goal;
 
     const clonedGoal = await this.goal.create({
       data: {
         description,
         targetDays,
-        achieved,
-        achievedAt,
+        achieved: false,
+        achievedAt: null,
         counterId,
       },
     });

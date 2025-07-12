@@ -114,6 +114,7 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
           select: {
             name: true,
             email: true,
+            sprintWins: true,
           },
         },
       },
@@ -135,6 +136,7 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
           select: {
             name: true,
             email: true,
+            sprintWins: true,
           },
         },
       },
