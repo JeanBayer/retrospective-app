@@ -30,10 +30,14 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
-  async getGoals(counterId: string) {
+  async getGoals(counterId: string, type: string) {
     const goals = await this.goal.findMany({
       where: {
         counterId,
+        achieved: type === 'achieved',
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 

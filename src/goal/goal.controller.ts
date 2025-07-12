@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
@@ -34,8 +35,11 @@ export class GoalController {
 
   @Get('')
   @UseGuards(UserExistInTeam, CounterExistInTeam)
-  getGoals(@Param('counterId', ParseUUIDPipe) counterId: string) {
-    return this.goalService.getGoals(counterId);
+  getGoals(
+    @Query('type') type: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+  ) {
+    return this.goalService.getGoals(counterId, type);
   }
 
   @Get('/:goalId')
