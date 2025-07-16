@@ -83,7 +83,7 @@ export const PASSWORD_RESET = {
                       <strong>{{code}}</strong>
                   </div>
 
-                  <p>Por favor, introduce este código en la página de restablecimiento de contraseña. Este código es válido por un tiempo limitado.</p>
+                  <p>Por favor, introduce este código en la página de restablecimiento de contraseña. Este código es válido por <strong>10 minutos</strong></p>
                   <p>Si no solicitaste este restablecimiento de contraseña, por favor ignora este correo electrónico o contáctanos si tienes alguna preocupación.</p>
               </div>
               <div class="footer">

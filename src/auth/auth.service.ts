@@ -14,6 +14,7 @@ import { envs } from 'src/config/envs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RequestResetUserDto } from './dto/request-reset-user.dto';
+import { ResetUserDto } from './dto/reset-user.dto';
 import {
   JwtPayload,
   JwtPayloadWithMetadata,
@@ -34,6 +35,58 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
   async signJWT(payload: JwtPayload) {
     return this.jwtService.signAsync(payload);
+  }
+
+  async resetUser(resetUserDto: ResetUserDto) {
+    const user = await this.user.findUnique({
+      where: {
+        email: resetUserDto.email,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User dont found');
+
+    const passwordReset = await this.passwordReset.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (!passwordReset)
+      throw new ConflictException('Password reset dont found');
+
+    const isCodeEqual = compareSync(
+      resetUserDto.code.toString(),
+      passwordReset.code,
+    );
+
+    if (!isCodeEqual) {
+      await this.passwordReset.delete({ where: { id: passwordReset.id } });
+      throw new ConflictException('Code invalid, generate a new code');
+    }
+
+    const timeDifference =
+      passwordReset.expiresAt.getTime() - new Date().getTime();
+
+    if (timeDifference < 0) {
+      await this.passwordReset.delete({ where: { id: passwordReset.id } });
+      throw new ConflictException('Code expired, generate a new code');
+    }
+
+    await this.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        password: hashSync(resetUserDto.password, 10),
+      },
+    });
+
+    await this.passwordReset.delete({ where: { id: passwordReset.id } });
+
+    const { id, name, email } = user;
+
+    return { id, name, email };
   }
 
   async requestResetUser(requestResetUserDto: RequestResetUserDto) {
@@ -74,7 +127,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       email: user.email,
       template: {
         type: 'password-reset',
-        data: { code, name: user.name },
+        data: { code, name: user.name, minutes: 10 },
       },
     });
   }
@@ -147,6 +200,8 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         this.jwtService.verify<JwtPayloadWithMetadata>(token, {
           secret: envs.JWT_SECRET,
         });
+
+      // TODO: crear logica para invalidar el token al resetear la contraseña
 
       return {
         user,

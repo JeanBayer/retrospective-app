@@ -4,6 +4,7 @@ import { Token } from './decorators/token.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { RequestResetUserDto } from './dto/request-reset-user.dto';
+import { ResetUserDto } from './dto/reset-user.dto';
 import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
@@ -27,6 +28,11 @@ export class AuthController {
   @Post('request-reset')
   requestResetUser(@Body() requestResetUserDto: RequestResetUserDto) {
     return this.authService.requestResetUser(requestResetUserDto);
+  }
+
+  @Post('reset-user')
+  resetUser(@Body() resetUserDto: ResetUserDto) {
+    return this.authService.resetUser(resetUserDto);
   }
 
   @UseGuards(AuthGuard)

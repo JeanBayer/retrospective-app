@@ -11,6 +11,7 @@ type SendEmail = {
     data: {
       code: number | string;
       name: string;
+      minutes: number;
     };
   };
 };
