@@ -27,6 +27,8 @@ model User {
   votesGiven    Vote[] @relation("VotesGiven")
   votesReceived Vote[] @relation("VotesReceived")
 
+  passwordResets PasswordReset[]
+
   sprintWinnerOfRetrospectives Retrospective[] @relation("SprintWinner")
 
   @@map("users")
@@ -187,4 +189,17 @@ model ThankYou {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("thank_yous")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  code      String   @map("hashed_code")
+  expiresAt DateTime @map("expires_at")
+
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("password_reset_tokens")
 }

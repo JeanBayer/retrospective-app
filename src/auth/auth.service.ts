@@ -2,15 +2,18 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
   OnModuleInit,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync, hashSync } from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
+import { sendEmail } from 'src/common/lib/email';
 import { envs } from 'src/config/envs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { RequestResetUserDto } from './dto/request-reset-user.dto';
 import {
   JwtPayload,
   JwtPayloadWithMetadata,
@@ -31,6 +34,49 @@ export class AuthService extends PrismaClient implements OnModuleInit {
 
   async signJWT(payload: JwtPayload) {
     return this.jwtService.signAsync(payload);
+  }
+
+  async requestResetUser(requestResetUserDto: RequestResetUserDto) {
+    const user = await this.user.findUnique({
+      where: {
+        email: requestResetUserDto.email,
+      },
+    });
+
+    if (!user) throw new NotFoundException('User dont found');
+
+    const passwordReset = await this.passwordReset.findFirst({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    if (passwordReset) {
+      const timeDifference =
+        passwordReset.expiresAt.getTime() - new Date().getTime();
+
+      if (timeDifference > 0)
+        throw new ConflictException('Code already sent to the email');
+
+      await this.passwordReset.delete({ where: { id: passwordReset.id } });
+    }
+
+    const { code, hashedCode } = this.generateResetCode();
+    await this.passwordReset.create({
+      data: {
+        code: hashedCode,
+        expiresAt: this.generateFutureDate(),
+        userId: user.id,
+      },
+    });
+
+    await sendEmail({
+      email: user.email,
+      template: {
+        type: 'password-reset',
+        data: { code, name: user.name },
+      },
+    });
   }
 
   async register(registerUserDto: RegisterUserDto) {
@@ -110,5 +156,25 @@ export class AuthService extends PrismaClient implements OnModuleInit {
       console.error(error);
       throw new UnauthorizedException('invalid token');
     }
+  }
+
+  private generateFutureDate() {
+    const expiresAt10Minutes = new Date();
+    expiresAt10Minutes.setMinutes(expiresAt10Minutes.getMinutes() + 10);
+
+    return expiresAt10Minutes;
+  }
+
+  private generateRandomSixDigitNumber() {
+    const min = 100000; // Smallest 6-digit number
+    const max = 999999; // Largest 6-digit number
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  private generateResetCode() {
+    const code = this.generateRandomSixDigitNumber();
+    const hashedCode = hashSync(code.toString(), 10);
+
+    return { code, hashedCode };
   }
 }

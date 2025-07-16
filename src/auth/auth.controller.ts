@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { Token } from './decorators/token.decorator';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RegisterUserDto } from './dto/register-user.dto';
+import { RequestResetUserDto } from './dto/request-reset-user.dto';
 import { AuthGuard } from './guards/auth.guard';
 
 @Controller('auth')
@@ -21,6 +22,11 @@ export class AuthController {
   loginUser(@Body() loginUserDto: LoginUserDto) {
     this.logger.log(`Logging in user: ${JSON.stringify(loginUserDto)}`);
     return this.authService.loginUser(loginUserDto);
+  }
+
+  @Post('request-reset')
+  requestResetUser(@Body() requestResetUserDto: RequestResetUserDto) {
+    return this.authService.requestResetUser(requestResetUserDto);
   }
 
   @UseGuards(AuthGuard)
