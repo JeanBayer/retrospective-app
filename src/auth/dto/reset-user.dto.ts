@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNumber,
@@ -17,6 +18,7 @@ export class ResetUserDto {
   @IsStrongPassword()
   password: string;
 
+  @Type(() => Number)
   @IsNumber()
   @IsPositive()
   @Min(100000)
