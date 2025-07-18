@@ -45,6 +45,21 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
       where: {
         teamId,
       },
+      select: {
+        id: true,
+        retrospectiveName: true,
+        retrospectiveNumber: true,
+        status: true,
+        teamId: true,
+        createdAt: true,
+        sprintWinner: {
+          select: {
+            id: true,
+            name: true,
+            sprintWins: true,
+          },
+        },
+      },
     });
 
     return retrospectives;
@@ -113,6 +128,21 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
     const retrospective = await this.retrospective.findFirst({
       where: {
         id: retroId,
+      },
+      select: {
+        id: true,
+        retrospectiveName: true,
+        retrospectiveNumber: true,
+        status: true,
+        teamId: true,
+        createdAt: true,
+        sprintWinner: {
+          select: {
+            id: true,
+            name: true,
+            sprintWins: true,
+          },
+        },
       },
     });
 
