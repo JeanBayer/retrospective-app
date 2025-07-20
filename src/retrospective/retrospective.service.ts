@@ -6,12 +6,18 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { CreateRetrospectiveDto } from './dto/create-retrospective.dto';
 import { UpdateRetrospectiveDto } from './dto/update-retrospective.dto';
 
 @Injectable()
 export class RetrospectiveService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(RetrospectiveService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
@@ -29,6 +35,11 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
           retrospectiveNumber: lastRetroNumber + 1,
           teamId,
         },
+      });
+
+      this.websocketGateway.server.to(teamId).emit('team', {
+        entity: ['TEAMS', retrospective.teamId, 'RETROSPECTIVES'],
+        data: {},
       });
 
       return retrospective;
@@ -59,6 +70,9 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
             sprintWins: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
 
@@ -120,6 +134,11 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
         },
       }),
     ]);
+
+    this.websocketGateway.server.to(retrospective.teamId).emit('team', {
+      entity: ['TEAMS', retrospective.teamId, 'RETROSPECTIVES'],
+      data: {},
+    });
 
     return retrospective;
   }

@@ -7,11 +7,17 @@ import {
 } from '@nestjs/common';
 import { compareSync } from 'bcrypt';
 import { PrismaClient } from 'generated/prisma';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { JoinTeamDto } from './dto/join-team.dto';
 
 @Injectable()
 export class MembershipService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(MembershipService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
@@ -36,6 +42,11 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
       throw new ConflictException('Error while trying to join the team.');
     }
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'MEMBERSHIP-LIST'],
+      data: {},
+    });
+
     return team;
   }
 
@@ -53,6 +64,11 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
       this.logger.error(error);
       throw new ConflictException('Error while trying to leave the team.');
     }
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS'],
+      data: {},
+    });
   }
 
   async promoteToAdmin(userId: string, teamId: string) {
@@ -68,6 +84,11 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
       data: {
         isAdmin: true,
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'MEMBERSHIP-LIST'],
+      data: {},
     });
   }
 
@@ -85,6 +106,11 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
         isAdmin: false,
       },
     });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'MEMBERSHIP-LIST'],
+      data: {},
+    });
   }
 
   async leaveUserFromTeam(userId: string, teamId: string) {
@@ -97,6 +123,11 @@ export class MembershipService extends PrismaClient implements OnModuleInit {
           teamId,
         },
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'MEMBERSHIP-LIST'],
+      data: {},
     });
   }
 

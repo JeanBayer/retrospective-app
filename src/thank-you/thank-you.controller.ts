@@ -33,6 +33,7 @@ export class ThankYouController {
     RetrospectiveOpenRequiredGuard,
   )
   createThankYou(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('retroId', ParseUUIDPipe) retrospectiveId: string,
     @Body() createThankYouDto: CreateThankYouDto,
     @User()
@@ -40,6 +41,7 @@ export class ThankYouController {
   ) {
     return this.thankYouService.createThankYou(
       user.id,
+      teamId,
       retrospectiveId,
       createThankYouDto,
     );

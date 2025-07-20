@@ -64,6 +64,9 @@ export class TeamService extends PrismaClient implements OnModuleInit {
         createdAt: true,
         updatedAt: true,
       },
+      orderBy: {
+        createdAt: 'asc',
+      },
     });
 
     return teams;

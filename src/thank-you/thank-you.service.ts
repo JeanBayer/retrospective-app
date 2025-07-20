@@ -5,21 +5,28 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { CreateThankYouDto } from './dto/create-thank-you.dto';
 
 @Injectable()
 export class ThankYouService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(ThankYouService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
 
   async createThankYou(
     userId: string,
+    teamId: string,
     retrospectiveId: string,
     createThankYouDto: CreateThankYouDto,
   ) {
-    return this.thankYou.create({
+    const thankYou = await this.thankYou.create({
       data: {
         giverId: userId,
         retrospectiveId,
@@ -47,6 +54,13 @@ export class ThankYouService extends PrismaClient implements OnModuleInit {
         createdAt: true,
       },
     });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'RETROSPECTIVES', retrospectiveId, 'THANK-YOU'],
+      data: thankYou,
+    });
+
+    return thankYou;
   }
 
   async getManyThankYou(retrospectiveId: string) {
@@ -73,6 +87,9 @@ export class ThankYouService extends PrismaClient implements OnModuleInit {
         },
         retrospectiveId: true,
         createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
   }

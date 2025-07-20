@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { ResetCounterDto } from './dto/reset-counter.dto';
 import { UpdateCounterDto } from './dto/update-counter.dto';
@@ -13,6 +14,11 @@ import { UpdateCounterDto } from './dto/update-counter.dto';
 @Injectable()
 export class CounterService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(CounterService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
@@ -29,10 +35,19 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER'],
+      data: {},
+    });
+
     return { ...counter, alreadyModifiedToday: false };
   }
 
-  async updateCounter(counterId: string, updateCounterDto: UpdateCounterDto) {
+  async updateCounter(
+    teamId: string,
+    counterId: string,
+    updateCounterDto: UpdateCounterDto,
+  ) {
     const alreadyModifiedToday =
       await this.hasCounterBeenModifiedToday(counterId);
 
@@ -45,14 +60,24 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER'],
+      data: {},
+    });
+
     return { ...counter, alreadyModifiedToday };
   }
 
-  async deleteCounter(counterId: string) {
+  async deleteCounter(teamId: string, counterId: string) {
     await this.counter.delete({
       where: {
         id: counterId,
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER'],
+      data: {},
     });
 
     return;
@@ -62,6 +87,9 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     const counters = await this.counter.findMany({
       where: {
         teamId,
+      },
+      orderBy: {
+        createdAt: 'asc',
       },
     });
 
@@ -98,7 +126,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     return { ...counter, alreadyModifiedToday };
   }
 
-  async incrementCounter(counterId: string) {
+  async incrementCounter(teamId: string, counterId: string) {
     const alreadyModifiedToday =
       await this.hasCounterBeenModifiedToday(counterId);
 
@@ -134,10 +162,19 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER'],
+      data: {},
+    });
+
     return { ...counter, alreadyModifiedToday: true };
   }
 
-  async resetCounter(counterId: string, resetCounterDto: ResetCounterDto) {
+  async resetCounter(
+    teamId: string,
+    counterId: string,
+    resetCounterDto: ResetCounterDto,
+  ) {
     const alreadyModifiedToday =
       await this.hasCounterBeenModifiedToday(counterId);
 
@@ -171,6 +208,11 @@ export class CounterService extends PrismaClient implements OnModuleInit {
         },
       }),
     ]);
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER'],
+      data: {},
+    });
 
     return { ...counter, alreadyModifiedToday: true };
   }
