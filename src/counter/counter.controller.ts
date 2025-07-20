@@ -31,7 +31,7 @@ export class CounterController {
 
   @Post('')
   @UseGuards(UserExistInTeam)
-  createTeam(
+  createCounter(
     @Param('teamId', ParseUUIDPipe) teamId: string,
     @Body() createCounterDto: CreateCounterDto,
   ) {
@@ -47,30 +47,42 @@ export class CounterController {
   @Patch('/:counterId')
   @UseGuards(AdminGuard, CounterExistInTeam)
   updateCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('counterId', ParseUUIDPipe) counterId: string,
     @Body() updateCounterDto: UpdateCounterDto,
   ) {
-    return this.counterService.updateCounter(counterId, updateCounterDto);
+    return this.counterService.updateCounter(
+      teamId,
+      counterId,
+      updateCounterDto,
+    );
   }
 
   @Delete('/:counterId')
   @UseGuards(AdminGuard, CounterExistInTeam)
-  deleteCounter(@Param('counterId', ParseUUIDPipe) counterId: string) {
-    return this.counterService.deleteCounter(counterId);
+  deleteCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+  ) {
+    return this.counterService.deleteCounter(teamId, counterId);
   }
 
   @Post('/:counterId/increment')
   @UseGuards(UserExistInTeam, CounterExistInTeam)
-  incrementCounter(@Param('counterId', ParseUUIDPipe) counterId: string) {
-    return this.counterService.incrementCounter(counterId);
+  incrementCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('counterId', ParseUUIDPipe) counterId: string,
+  ) {
+    return this.counterService.incrementCounter(teamId, counterId);
   }
 
   @Post('/:counterId/reset')
   @UseGuards(UserExistInTeam, CounterExistInTeam)
   resetCounter(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('counterId', ParseUUIDPipe) counterId: string,
     @Body() resetCounterDto: ResetCounterDto,
   ) {
-    return this.counterService.resetCounter(counterId, resetCounterDto);
+    return this.counterService.resetCounter(teamId, counterId, resetCounterDto);
   }
 }

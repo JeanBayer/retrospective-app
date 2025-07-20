@@ -29,6 +29,7 @@ export class SprintWinnerController {
     RetrospectiveOpenRequiredGuard,
   )
   voteWinner(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('retroId', ParseUUIDPipe) retrospectiveId: string,
     @Body('userId', ParseUUIDPipe) votedForId: string,
     @User()
@@ -36,6 +37,7 @@ export class SprintWinnerController {
   ) {
     return this.sprintWinnerService.voteWinner(
       user.id,
+      teamId,
       retrospectiveId,
       votedForId,
     );

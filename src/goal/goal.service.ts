@@ -37,7 +37,7 @@ export class GoalService extends PrismaClient implements OnModuleInit {
         achieved: type === 'achieved',
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     });
 

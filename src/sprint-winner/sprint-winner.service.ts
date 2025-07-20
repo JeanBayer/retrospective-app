@@ -6,16 +6,23 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 
 @Injectable()
 export class SprintWinnerService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(SprintWinnerService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
 
   async voteWinner(
     userId: string,
+    teamId: string,
     retrospectiveId: string,
     votedForId: string,
   ) {
@@ -29,6 +36,18 @@ export class SprintWinnerService extends PrismaClient implements OnModuleInit {
         retrospectiveId,
         votedForId,
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: [
+        'TEAMS',
+        teamId,
+        'RETROSPECTIVES',
+        retrospectiveId,
+        'SPRINT-WINNER',
+        'VOTE-STATUS',
+      ],
+      data: {},
     });
   }
 
