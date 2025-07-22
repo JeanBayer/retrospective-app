@@ -27,10 +27,11 @@ export class GoalController {
   @Post('')
   @UseGuards(UserExistInTeam, CounterExistInTeam)
   createGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('counterId', ParseUUIDPipe) counterId: string,
     @Body() createGoalDto: CreateGoalDto,
   ) {
-    return this.goalService.createGoal(counterId, createGoalDto);
+    return this.goalService.createGoal(teamId, counterId, createGoalDto);
   }
 
   @Get('')
@@ -51,27 +52,37 @@ export class GoalController {
   @Patch('/:goalId')
   @UseGuards(AdminGuard, CounterExistInTeam, GoalExistInCounter)
   updateGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
     @Param('goalId', ParseUUIDPipe) goalId: string,
     @Body() updateGoalDto: UpdateGoalDto,
   ) {
-    return this.goalService.updateGoal(goalId, updateGoalDto);
+    return this.goalService.updateGoal(teamId, goalId, updateGoalDto);
   }
 
   @Delete('/:goalId')
   @UseGuards(AdminGuard, CounterExistInTeam, GoalExistInCounter)
-  deleteGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
-    return this.goalService.deleteGoal(goalId);
+  deleteGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('goalId', ParseUUIDPipe) goalId: string,
+  ) {
+    return this.goalService.deleteGoal(teamId, goalId);
   }
 
   @Post('/:goalId/clone')
   @UseGuards(UserExistInTeam, CounterExistInTeam, GoalExistInCounter)
-  cloneGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
-    return this.goalService.cloneGoal(goalId);
+  cloneGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('goalId', ParseUUIDPipe) goalId: string,
+  ) {
+    return this.goalService.cloneGoal(teamId, goalId);
   }
 
   @Post('/:goalId/reactivate')
   @UseGuards(AdminGuard, CounterExistInTeam, GoalExistInCounter)
-  reactivateGoal(@Param('goalId', ParseUUIDPipe) goalId: string) {
-    return this.goalService.reactivateGoal(goalId);
+  reactivateGoal(
+    @Param('teamId', ParseUUIDPipe) teamId: string,
+    @Param('goalId', ParseUUIDPipe) goalId: string,
+  ) {
+    return this.goalService.reactivateGoal(teamId, goalId);
   }
 }

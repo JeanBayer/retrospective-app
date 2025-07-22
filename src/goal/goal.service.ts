@@ -6,17 +6,27 @@ import {
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
 import { CounterService } from 'src/counter/counter.service';
+import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
 
 @Injectable()
 export class GoalService extends PrismaClient implements OnModuleInit {
   private readonly logger = new Logger(CounterService.name);
+
+  constructor(private readonly websocketGateway: WebsocketGateway) {
+    super();
+  }
+
   async onModuleInit() {
     await this.$connect();
   }
 
-  async createGoal(counterId: string, createGoalDto: CreateGoalDto) {
+  async createGoal(
+    teamId: string,
+    counterId: string,
+    createGoalDto: CreateGoalDto,
+  ) {
     const { description, targetDays } = createGoalDto;
 
     const goal = await this.goal.create({
@@ -25,6 +35,11 @@ export class GoalService extends PrismaClient implements OnModuleInit {
         targetDays,
         counterId,
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER', counterId, 'GOALS'],
+      data: {},
     });
 
     return goal;
@@ -54,7 +69,11 @@ export class GoalService extends PrismaClient implements OnModuleInit {
     return goal;
   }
 
-  async updateGoal(goalId: string, updateGoalDto: UpdateGoalDto) {
+  async updateGoal(
+    teamId: string,
+    goalId: string,
+    updateGoalDto: UpdateGoalDto,
+  ) {
     const goal = await this.goal.update({
       where: {
         id: goalId,
@@ -64,18 +83,28 @@ export class GoalService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER', goal.counterId, 'GOALS'],
+      data: {},
+    });
+
     return goal;
   }
 
-  async deleteGoal(goalId: string) {
-    await this.goal.delete({
+  async deleteGoal(teamId: string, goalId: string) {
+    const goal = await this.goal.delete({
       where: {
         id: goalId,
       },
     });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER', goal.counterId, 'GOALS'],
+      data: {},
+    });
   }
 
-  async cloneGoal(goalId: string) {
+  async cloneGoal(teamId: string, goalId: string) {
     const goal = await this.getGoal(goalId);
 
     if (!goal) throw new NotFoundException('Goal don`t found');
@@ -92,10 +121,15 @@ export class GoalService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER', goal.counterId, 'GOALS'],
+      data: {},
+    });
+
     return clonedGoal;
   }
 
-  async reactivateGoal(goalId: string) {
+  async reactivateGoal(teamId: string, goalId: string) {
     const goal = await this.goal.update({
       where: {
         id: goalId,
@@ -104,6 +138,11 @@ export class GoalService extends PrismaClient implements OnModuleInit {
         achieved: false,
         achievedAt: null,
       },
+    });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'COUNTER', goal.counterId, 'GOALS'],
+      data: {},
     });
 
     return goal;
