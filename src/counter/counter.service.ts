@@ -6,6 +6,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { TimeUtils } from 'src/common/lib/time';
 import { WebsocketGateway } from 'src/websocket/websocket.gateway';
 import { CreateCounterDto } from './dto/create-counter.dto';
 import { ResetCounterDto } from './dto/reset-counter.dto';
@@ -143,7 +144,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       this.counterIncrementRecord.create({
         data: {
           counterId,
-          incrementedAt: this.getToday(),
+          incrementedAt: TimeUtils.getTodayStartInChile(),
         },
       }),
     ]);
@@ -158,7 +159,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
       },
       data: {
         achieved: true,
-        achievedAt: this.getToday(true),
+        achievedAt: TimeUtils.getCurrentTimeInChile(),
       },
     });
 
@@ -203,7 +204,7 @@ export class CounterService extends PrismaClient implements OnModuleInit {
         data: {
           counterId,
           countBeforeReset: lastResetDuration,
-          resetOccurredAt: this.getToday(),
+          resetOccurredAt: TimeUtils.getTodayStartInChile(),
           nameResetEvent: resetCounterDto.nameEvent,
         },
       }),
@@ -242,26 +243,29 @@ export class CounterService extends PrismaClient implements OnModuleInit {
     };
   }
 
-  private getToday(inRealTime: boolean = false) {
-    const today = new Date();
-    if (!inRealTime) today.setUTCHours(0, 0, 0, 0);
-
-    return today;
-  }
-
   private async hasCounterBeenModifiedToday(counterId: string) {
+    const { start, end } = TimeUtils.getTodayRangeInChile();
+
+    // Buscar incrementos en el rango del día actual en Chile
     const alreadyIncrementedCount = await this.counterIncrementRecord.count({
       where: {
         counterId,
-        incrementedAt: this.getToday(),
+        incrementedAt: {
+          gte: start,
+          lte: end,
+        },
       },
     });
 
     if (alreadyIncrementedCount < 1) {
+      // Si no hay incrementos, verificar resets
       const alreadyResetCount = await this.counterResetRecord.count({
         where: {
           counterId,
-          resetOccurredAt: this.getToday(),
+          resetOccurredAt: {
+            gte: start,
+            lte: end,
+          },
         },
       });
 
