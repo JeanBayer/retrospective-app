@@ -4,9 +4,9 @@ import {
   IsNumber,
   IsPositive,
   IsString,
-  IsStrongPassword,
   Max,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class ResetUserDto {
@@ -15,7 +15,7 @@ export class ResetUserDto {
   email: string;
 
   @IsString()
-  @IsStrongPassword()
+  @MinLength(3)
   password: string;
 
   @Type(() => Number)

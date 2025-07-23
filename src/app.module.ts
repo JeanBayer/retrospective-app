@@ -9,6 +9,7 @@ import { TeamModule } from './team/team.module';
 import { ThankYouModule } from './thank-you/thank-you.module';
 import { UserModule } from './user/user.module';
 import { WebsocketModule } from './websocket/websocket.module';
+import { TimerModule } from './timer/timer.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     ThankYouModule,
     UserModule,
     WebsocketModule,
+    TimerModule,
   ],
   controllers: [],
   providers: [],
