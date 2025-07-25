@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserExistInTeam } from 'src/membership/guards/user-exist-in-team.guard';
+import { AdminGuard } from 'src/team/guards/admin.guard';
 import { CreateTimerDto } from './dto/create-timer.dto';
 import { TimerService } from './timer.service';
 
@@ -28,7 +29,7 @@ export class TimerController {
   }
 
   @Delete('')
-  @UseGuards(UserExistInTeam)
+  @UseGuards(AdminGuard)
   cancelTimer(@Param('teamId', ParseUUIDPipe) teamId: string) {
     return this.timerService.cancelTimer(teamId);
   }

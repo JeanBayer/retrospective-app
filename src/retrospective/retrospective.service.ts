@@ -92,6 +92,11 @@ export class RetrospectiveService extends PrismaClient implements OnModuleInit {
       },
     });
 
+    this.websocketGateway.server.to(retrospective.teamId).emit('team', {
+      entity: ['TEAMS', retrospective.teamId, 'RETROSPECTIVES'],
+      data: {},
+    });
+
     return retrospective;
   }
 
