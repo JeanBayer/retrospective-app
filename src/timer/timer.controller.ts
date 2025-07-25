@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -24,6 +25,12 @@ export class TimerController {
     @Body() createTimerDto: CreateTimerDto,
   ) {
     return this.timerService.createTimer(teamId, createTimerDto);
+  }
+
+  @Delete('')
+  @UseGuards(UserExistInTeam)
+  cancelTimer(@Param('teamId', ParseUUIDPipe) teamId: string) {
+    return this.timerService.cancelTimer(teamId);
   }
 
   @Get('')

@@ -20,8 +20,6 @@ export class UserExistInTeam implements CanActivate {
     }
     const { user } = request;
 
-    console.log('UserExistInTeam Guard', { user, teamId });
-
     if (!user || !user?.id) {
       throw new ForbiddenException('User is not authenticated');
     }

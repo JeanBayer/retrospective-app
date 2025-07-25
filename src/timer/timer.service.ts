@@ -49,6 +49,19 @@ export class TimerService extends PrismaClient implements OnModuleInit {
     return timer;
   }
 
+  async cancelTimer(teamId: string) {
+    const existTimerValid = await this.validateOrDeleteExpiredTimer(teamId);
+    if (!existTimerValid) {
+      throw new ConflictException('No existe un timer activo');
+    }
+    await this.timer.delete({ where: { id: existTimerValid.id } });
+
+    this.websocketGateway.server.to(teamId).emit('team', {
+      entity: ['TEAMS', teamId, 'TIMER'],
+      data: {},
+    });
+  }
+
   async getTimer(teamId: string) {
     return await this.validateOrDeleteExpiredTimer(teamId);
   }
